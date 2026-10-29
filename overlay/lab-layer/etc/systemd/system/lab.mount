@@ -1,0 +1,10 @@
+# Lab only: host directory lab/ shared over 9p (our .so builds, tools, test scripts).
+[Unit]
+Description=MPC lab share
+[Mount]
+What=lab
+Where=/lab
+Type=9p
+Options=trans=virtio,version=9p2000.L,msize=262144,nofail
+[Install]
+WantedBy=multi-user.target

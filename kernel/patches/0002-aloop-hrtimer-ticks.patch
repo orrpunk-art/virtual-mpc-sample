@@ -1,0 +1,193 @@
+snd-aloop: hrtimer period ticks instead of the jiffies timer wheel (lab only).
+
+Measured with a diagnostic print (2026-10-27): the stock jiffies timer fired 2-5 ms late on
+nearly every period (~100 times a second). MPC Sample runs 128-frame (2.9 ms) periods in a
+384-frame buffer, so those late period interrupts became xruns: the app restarts its linked
+streams, which is a click. The device has DMA period interrupts in hard IRQ context.
+
+This patch clocks the default timer mode with an hrtimer in 250 us ticks. Without
+PREEMPT_RT it runs in hard interrupt context like a DMA period interrupt; with PREEMPT_RT
+it has to be a soft hrtimer (ksoftirqd, SCHED_OTHER), because cable->lock and the PCM
+stream lock are sleeping locks there.
+
+--- a/sound/drivers/aloop.c	2026-10-27 14:23:40.320104464 +0000
++++ b/sound/drivers/aloop.c	2026-10-27 14:23:40.343763006 +0000
+@@ -17,6 +17,8 @@
+ 
+ #include <linux/init.h>
+ #include <linux/jiffies.h>
++#include <linux/hrtimer.h>
++#include <linux/ktime.h>
+ #include <linux/slab.h>
+ #include <linux/time.h>
+ #include <linux/wait.h>
+@@ -159,7 +161,7 @@
+ 	unsigned int last_drift;
+ 	unsigned long last_jiffies;
+ 	/* If jiffies timer is used */
+-	struct timer_list timer;
++	struct hrtimer timer;
+ 
+ 	/* size of per channel buffer in case of non-interleaved access */
+ 	unsigned int channel_buf_n;
+@@ -167,13 +169,32 @@
+ 
+ static struct platform_device *devices[SNDRV_CARDS];
+ 
++/*
++ * Timer ticks for the "jiffies" timer mode: 250 us from the monotonic clock instead of
++ * jiffies (1 ms at HZ=1000). With 128-frame (2.9 ms) periods, jiffies granularity delays
++ * period interrupts enough to underrun a 3-period playback buffer about once a second.
++ * The bytes x ticks arithmetic below stays within 32 bits for <= 1 s of 1.4 MB/s.
++ */
++#define LOOP_HZ 4000
++#ifdef CONFIG_PREEMPT_RT
++/* cable->lock and the PCM stream lock sleep on RT: the callback must run in a thread */
++#define LOOP_HRTIMER_MODE HRTIMER_MODE_REL_SOFT
++#else
++/* in hard interrupt context, like the period interrupt of a DMA engine */
++#define LOOP_HRTIMER_MODE HRTIMER_MODE_REL_HARD
++#endif
++static inline unsigned long loop_ticks(void)
++{
++	return (unsigned long)div_u64(ktime_get_ns(), NSEC_PER_SEC / LOOP_HZ);
++}
++
+ static inline unsigned int byte_pos(struct loopback_pcm *dpcm, unsigned int x)
+ {
+ 	if (dpcm->pcm_rate_shift == NO_PITCH) {
+-		x /= HZ;
++		x /= LOOP_HZ;
+ 	} else {
+ 		x = div_u64(NO_PITCH * (unsigned long long)x,
+-			    HZ * (unsigned long long)dpcm->pcm_rate_shift);
++			    LOOP_HZ * (unsigned long long)dpcm->pcm_rate_shift);
+ 	}
+ 	return x - (x % dpcm->pcm_salign);
+ }
+@@ -181,9 +202,9 @@
+ static inline unsigned int frac_pos(struct loopback_pcm *dpcm, unsigned int x)
+ {
+ 	if (dpcm->pcm_rate_shift == NO_PITCH) {	/* no pitch */
+-		return x * HZ;
++		return x * LOOP_HZ;
+ 	} else {
+-		x = div_u64(dpcm->pcm_rate_shift * (unsigned long long)x * HZ,
++		x = div_u64(dpcm->pcm_rate_shift * (unsigned long long)x * LOOP_HZ,
+ 			    NO_PITCH);
+ 	}
+ 	return x;
+@@ -224,7 +245,8 @@
+ 	}
+ 	tick = dpcm->period_size_frac - dpcm->irq_pos;
+ 	tick = DIV_ROUND_UP(tick, dpcm->pcm_bps);
+-	mod_timer(&dpcm->timer, jiffies + tick);
++	hrtimer_start(&dpcm->timer, ns_to_ktime((u64)tick * (NSEC_PER_SEC / LOOP_HZ)),
++		      LOOP_HRTIMER_MODE);
+ 
+ 	return 0;
+ }
+@@ -261,8 +283,7 @@
+ /* call in cable->lock */
+ static inline int loopback_jiffies_timer_stop(struct loopback_pcm *dpcm)
+ {
+-	del_timer(&dpcm->timer);
+-	dpcm->timer.expires = 0;
++	hrtimer_try_to_cancel(&dpcm->timer);
+ 
+ 	return 0;
+ }
+@@ -292,7 +313,7 @@
+ 
+ static inline int loopback_jiffies_timer_stop_sync(struct loopback_pcm *dpcm)
+ {
+-	del_timer_sync(&dpcm->timer);
++	hrtimer_cancel(&dpcm->timer);
+ 
+ 	return 0;
+ }
+@@ -410,7 +431,7 @@
+ 		err = loopback_check_format(cable, substream->stream);
+ 		if (err < 0)
+ 			return err;
+-		dpcm->last_jiffies = jiffies;
++		dpcm->last_jiffies = loop_ticks();
+ 		dpcm->pcm_rate_shift = 0;
+ 		dpcm->last_drift = 0;
+ 		spin_lock(&cable->lock);	
+@@ -442,7 +463,7 @@
+ 	case SNDRV_PCM_TRIGGER_PAUSE_RELEASE:
+ 	case SNDRV_PCM_TRIGGER_RESUME:
+ 		spin_lock(&cable->lock);
+-		dpcm->last_jiffies = jiffies;
++		dpcm->last_jiffies = loop_ticks();
+ 		cable->pause &= ~stream;
+ 		err = cable->ops->start(dpcm);
+ 		spin_unlock(&cable->lock);
+@@ -621,6 +642,8 @@
+ 	unsigned long last_pos;
+ 	unsigned int delta;
+ 
++	if (jiffies_delta > LOOP_HZ / 4)	/* keep delta * pcm_bps within 32 bits */
++		jiffies_delta = LOOP_HZ / 4;
+ 	last_pos = byte_pos(dpcm, dpcm->irq_pos);
+ 	dpcm->irq_pos += jiffies_delta * dpcm->pcm_bps;
+ 	delta = byte_pos(dpcm, dpcm->irq_pos) - last_pos;
+@@ -652,7 +675,7 @@
+ 	unsigned long delta_play = 0, delta_capt = 0, cur_jiffies;
+ 	unsigned int running, count1, count2;
+ 
+-	cur_jiffies = jiffies;
++	cur_jiffies = loop_ticks();
+ 	running = cable->running ^ cable->pause;
+ 	if (running & (1 << SNDRV_PCM_STREAM_PLAYBACK)) {
+ 		delta_play = cur_jiffies - dpcm_play->last_jiffies;
+@@ -697,9 +720,9 @@
+ 	return running;
+ }
+ 
+-static void loopback_jiffies_timer_function(struct timer_list *t)
++static enum hrtimer_restart loopback_jiffies_timer_function(struct hrtimer *t)
+ {
+-	struct loopback_pcm *dpcm = from_timer(dpcm, t, timer);
++	struct loopback_pcm *dpcm = container_of(t, struct loopback_pcm, timer);
+ 	unsigned long flags;
+ 
+ 	spin_lock_irqsave(&dpcm->cable->lock, flags);
+@@ -711,10 +734,11 @@
+ 			spin_unlock_irqrestore(&dpcm->cable->lock, flags);
+ 			/* need to unlock before calling below */
+ 			snd_pcm_period_elapsed(dpcm->substream);
+-			return;
++			return HRTIMER_NORESTART;	/* re-armed above if still running */
+ 		}
+ 	}
+ 	spin_unlock_irqrestore(&dpcm->cable->lock, flags);
++	return HRTIMER_NORESTART;
+ }
+ 
+ /* call in cable->lock */
+@@ -885,9 +909,10 @@
+ 		    dpcm->period_update_pending);
+ 	snd_iprintf(buffer, "    irq_pos:\t\t%u\n", dpcm->irq_pos);
+ 	snd_iprintf(buffer, "    period_frac:\t%u\n", dpcm->period_size_frac);
+-	snd_iprintf(buffer, "    last_jiffies:\t%lu (%lu)\n",
+-		    dpcm->last_jiffies, jiffies);
+-	snd_iprintf(buffer, "    timer_expires:\t%lu\n", dpcm->timer.expires);
++	snd_iprintf(buffer, "    last_ticks:\t%lu (%lu)\n",
++		    dpcm->last_jiffies, loop_ticks());
++	snd_iprintf(buffer, "    timer_expires:\t%lld\n",
++		    ktime_to_ns(hrtimer_get_expires(&dpcm->timer)));
+ }
+ 
+ static void loopback_snd_timer_dpcm_info(struct loopback_pcm *dpcm,
+@@ -1062,7 +1087,8 @@
+ 
+ static int loopback_jiffies_timer_open(struct loopback_pcm *dpcm)
+ {
+-	timer_setup(&dpcm->timer, loopback_jiffies_timer_function, 0);
++	hrtimer_init(&dpcm->timer, CLOCK_MONOTONIC, LOOP_HRTIMER_MODE);
++	dpcm->timer.function = loopback_jiffies_timer_function;
+ 
+ 	return 0;
+ }

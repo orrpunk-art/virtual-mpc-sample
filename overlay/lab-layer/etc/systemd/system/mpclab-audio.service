@@ -1,0 +1,14 @@
+# Lab only: the rear audio jacks. Streams MPC Sample's output to the panel page over the
+# virtio-serial port mpclab.pcm (the page plays it) and feeds the app's input.
+# The app keeps playing into snd-aloop, so its audio timing and panel latency are unchanged.
+[Unit]
+Description=MPC lab audio bridge to the host
+After=ac50.service
+
+[Service]
+ExecStart=/opt/mpclab/bin/mpclab-audio-bridge
+Restart=always
+RestartSec=2
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,14 @@
+out/
+share/
+# proprietary firmware never enters this repo
+firmware/
+/firmware
+*.fit
+*.ext4
+*.raw
+*.qcow2
+__pycache__/
+sdcard/
+.DS_Store
+.idea/
+/ext/

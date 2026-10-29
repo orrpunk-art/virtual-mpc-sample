@@ -1,0 +1,7 @@
+# Lab only: QEMU user-mode network on the virtio NIC (host forwards :2222 -> :22).
+[Match]
+Driver=virtio_net
+[Network]
+Address=10.0.2.15/24
+Gateway=10.0.2.2
+DNS=10.0.2.3

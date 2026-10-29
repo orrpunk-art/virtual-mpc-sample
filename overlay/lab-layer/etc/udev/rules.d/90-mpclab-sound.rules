@@ -1,0 +1,11 @@
+# Lab only. On the device the audio card is the simple-audio-card platform node "sound",
+# and MPC Sample polls exactly /dev/snd/by-path/platform-sound. Give that name to snd-aloop:
+# it keeps the 128-frame stream running without xruns. On virtio-snd the stream failed with
+# EIO every second, and since the app handles panel input in step with audio, input lagged
+# by seconds (measured 2026-10-27: aloop 40-100 ms).
+SUBSYSTEM=="sound", KERNEL=="controlC*", DRIVERS=="snd_aloop", SYMLINK+="snd/by-path/platform-sound"
+
+# az0x-firmware-tool talks to the panel MCU as hw:/dev/snd/by-path/platform-fe670000.serial
+# (the device's control-surface UART). Give the PL011 serial-midi card the same name so
+# the stock version check reaches the lab MCU emulator.
+SUBSYSTEM=="sound", KERNEL=="controlC*", DRIVERS=="snd-serial-generic", SYMLINK+="snd/by-path/platform-fe670000.serial"

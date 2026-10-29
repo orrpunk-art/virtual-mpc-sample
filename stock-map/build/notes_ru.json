@@ -1,0 +1,582 @@
+{
+ "SAMPLE": {
+  "screen": "Sample: редактор звука пэда",
+  "keys": [
+   "Trim → Mix → Amp Env (по кругу)",
+   "Tune → Play",
+   "Filter → Flt Env"
+  ],
+  "knobs": [
+   "Start · Volume · Attack · Semi Tune · Mono/Poly · Cutoff",
+   "End · (⇧ Kit Volume) · Decay/Release · Fine Tune · Mute Grp · Reso",
+   "Loop · Pan · Vel Sens · Warp · Offset · тип фильтра"
+  ],
+  "data": "нажатие переносит рамку на следующий параметр; поворот меняет параметр в рамке (на снимке End)",
+  "note": "Экран «домой» для всей карты. Повторное нажатие SCREEN на выбранной вкладке листает её страницы (точки под вкладкой). Значки справа от имени сэмпла: нота = Note On (SHIFT + CHOP), стрелка = Reverse (SHIFT + LOOP), петля = LOOP, 16 = 16 LEVELS. С зажатым SHIFT подписи меняются: SCREEN 1 Loop Lock (замок у Loop), SCREEN 2 Normalize (нормализует сэмпл, имя получает «-Normalized»), K1–K3 Zoom: Start / Zoom: End / Zoom: Loop.",
+  "steps": {
+   "SCREEN 1": "вкладка 1, следующая страница (Trim → Mix)",
+   "SCREEN 2": "вкладка Tune: Semi Tune, Fine Tune, Warp",
+   "SCREEN 3": "вкладка Filter: Cutoff, Reso, тип",
+   "SCREEN 1|SCREEN 1": "Amp Env: Attack, Decay, Vel Sens",
+   "SCREEN 2|SCREEN 2": "Play: Mono, Mute Grp, Offset",
+   "SCREEN 3|SCREEN 3": "Flt Env: Attack, Decay, Depth",
+   "DATA": "рамка переходит на End",
+   "turn:1": "поворот меняет End",
+   "SHIFT+SCREEN 1": "Loop Lock вкл/выкл (замок у Loop)",
+   "SHIFT+SCREEN 2": "Normalize: сэмпл нормализуется"
+  },
+  "does": "Главный режим: играть сэмплы на пэдах и править их звук. Удар по пэду играет его и показывает волну; SAMPLE + пэд выбирает пэд без звука. Вкладки: Trim (начало, конец, точка петли), Mix (громкость, панорама; ⇧K2 — громкость всего кита), Amp Env (атака, спад или release, чувствительность к силе удара), Tune (полутона, центы, Warp; ⇧K3 — число долей), Play (Mono/Poly, группа глушения; ⇧K2 — Pad Link, Offset — задержка старта), Filter (срез, резонанс, тип: Classic как у MPC3000, LPF/HPF/BPF 2 или 4) и Flt Env (огибающая фильтра). ⇧B1 Loop Lock — начало петли привязано к началу сэмпла; ⇧B2 Normalize — поднимает пик до 0 дБ.",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/sample_mode.htm"
+ },
+ "SEQ": {
+  "screen": "Seq: секвенция, темп, транспорт",
+  "keys": [
+   "темп (128.00)",
+   "BPM: SEQ ↔ GBL (темп секвенции или общий)",
+   "Rec Quant вкл/выкл"
+  ],
+  "knobs": [
+   "длина: 2 Bars",
+   "Q 1/16 (квантование)",
+   "RT Swing"
+  ],
+  "data": "поворот двигает позицию (001.01 → 001.02)",
+  "note": "На экране: номер секвенции (Seq A01), размер 4/4, метроном Rec, счёт 1234, позиция «такт.доля.тик».",
+  "steps": {
+   "SCREEN 2": "BPM: SEQ → GBL",
+   "SCREEN 3": "Rec Quant выключается",
+   "turn:1": "позиция 001.02"
+  },
+  "does": "Режим секвенций: пэды выбирают секвенцию (зелёные — с нотами), PLAY запускает, во время игры удар по другому пэду ставит следующую в очередь. Держите B1 и крутите колесо — темп; B2 — темп у каждой секвенции свой (SEQ) или общий (GBL); B3 — квантование записи. K1 длина (1–128 тактов, с ⇧ любая), K2 сетка Q, K3 живой свинг; ⇧K2 размер, ⇧K3 громкость метронома. Колесо двигает позицию по долям (с ⇧ — по Q). SEQ + SAMPLE вместе: экран секвенции, а пэды играют сэмплы.",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/sequence_mode.htm"
+ },
+ "PAD FX": {
+  "screen": "Pad FX: 16 эффектов на пэдах",
+  "keys": [
+   "Latch (держать эффект без удержания пэда)",
+   "–",
+   "–"
+  ],
+  "knobs": [
+   "параметр 1 выбранного эффекта (Half Speed: Speed)",
+   "Mix",
+   "–"
+  ],
+  "note": "Пэды 1–16: Beat Repeat, Rev Stepper, Delay, Reverb, Ring Mod, LoFi, Color, Granulator, Comb Filter, LP Filter, HP Filter, BP Filter, Half Speed, Chorus, Flanger, Phaser. Эффект работает, пока пэд нажат (или закреплён Latch).",
+  "steps": {
+   "SCREEN 1": "Latch включён, на эффекте значок замка"
+  },
+  "does": "Эффекты на пэдах поверх всей секвенции: пэд включает эффект, чем сильнее давить — тем сильнее эффект. Одновременно до четырёх; пятый выключает самый первый. K1–K3 — параметры эффекта (у каждого свои), B1 Latch фиксирует эффект на текущей силе.",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/pad_fx.htm"
+ },
+ "KNOB FX": {
+  "screen": "Knob FX: ручки управляют эффектом",
+  "keys": [
+   "вкладки текущего экрана",
+   "",
+   ""
+  ],
+  "knobs": [
+   "Frequency (параметр 1 эффекта)",
+   "Resonance",
+   "–"
+  ],
+  "note": "Всплывает «Knob FX: LP Filter», нижняя строка становится оранжевой: K1–K3 крутят выбранный в FX SELECT эффект поверх любого экрана. Повторное KNOB FX возвращает ручкам их обычную роль.",
+  "steps": {
+   "SCREEN 1": "вкладки Sample работают как обычно",
+   "SCREEN 3": "Filter, ручки остаются за эффектом"
+  },
+  "does": "Ручки K1–K3 крутят один выбранный эффект (выбирается в FX SELECT), а пэды остаются свободными: можно играть сэмплы или Pad FX одновременно. Пока Knob FX включён, ручки не меняют параметры страниц. Эффект действует на выбранные пэды или на все.",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/knob_fx.htm"
+ },
+ "ERASE": {
+  "screen": "остаётся экран Sample",
+  "note": "Одно нажатие ERASE видимо ничего не открывает: кнопку держат вместе с другой кнопкой или пэдом (такие пары обход не нажимал). Внутри работают вкладки Sample как обычно.",
+  "steps": {
+   "SHIFT+SCREEN 1": "Loop Lock вкл/выкл (замок у Loop)"
+  },
+  "does": "Стирание. Остановлено, режим Sample: ERASE + пэд удаляет сэмпл с пэда. Во время игры ERASE + удержание пэда стирает его ноты в секвенции. В режиме Seq ERASE + пэд стирает секвенцию. ERASE + поворот ручки стирает запись автоматизации этого параметра (подтверждение B3).",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/features.htm"
+ },
+ "NOTE REPEAT": {
+  "screen": "Note Repeat: выбор частоты повтора",
+  "keys": [
+   "1/8",
+   "1/16",
+   "1/32"
+  ],
+  "exit": "ещё раз NOTE REPEAT; SAMPLE и другие режимы его не выключают",
+  "note": "Режим остаётся включённым: вместо вкладок вверху строка частот, ниже экран, где вы были. Удар по пэду в этом режиме обход не проверял. Повторное нажатие выбранной частоты снимает выбор; SHIFT + SCREEN тоже оставляет все три невыбранными.",
+  "steps": {
+   "SCREEN 2": "1/16",
+   "SCREEN 3": "1/32",
+   "SCREEN 1": "1/8",
+   "SHIFT+SCREEN 1": "ни одна частота не выбрана",
+   "turn:1": "DATA крутит параметр Sample под строкой частот"
+  },
+  "does": "Повтор нот: пока режим включён, зажатый пэд звучит повторно с выбранной долей (B1–B3: 1/8, 1/16, 1/32). Можно держать NOTE REPEAT — режим работает, пока кнопка нажата. С зажатым SHIFT вместо долей предлагаются триоли. На повтор влияет и Swing из Time Correct.",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/features.htm"
+ },
+ "PAD BANK": {
+  "screen": "остаётся экран Sample, меняется банк пэдов",
+  "note": "PAD BANK листает банки пэдов A → B → … → H (видно по лампам банка, экран не меняется). SHIFT + PAD BANK листает в обратную сторону (проверено отдельно через номер банка).",
+  "does": "Банки пэдов A–H: каждое нажатие — следующий банк. PAD BANK + пэды 1–8 сразу прыгают на банк A–H. Текущий банк виден у ручки MAIN VOLUME.",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/features.htm"
+ },
+ "CHOP": {
+  "screen": "Chop: нарезка сэмпла на части",
+  "keys": [
+   "Chop → Mix → Amp Env",
+   "Tune → Play",
+   "Filter → Flt Env"
+  ],
+  "knobs": [
+   "Start (части)",
+   "End",
+   "Chop Type (способ нарезки)"
+  ],
+  "data": "нажатие: рамка на следующий параметр; поворот меняет его",
+  "exit": "ещё раз CHOP (SAMPLE его не выключает)",
+  "note": "Вкладка 1 становится Chop: на волне линии разрезов, справа вверху номер части. С зажатым SHIFT подписи меняются: SCREEN 1 Extract, SCREEN 2 Split, SCREEN 3 Merge; K1 Zoom: Start, K2 Zoom: End, K3 Threshold.",
+  "steps": {
+   "SHIFT+SCREEN 1": "Extract: часть уходит на свободный пэд («Extracted to: Pad A04»), проект меняется",
+   "SHIFT+SCREEN 2": "Split",
+   "SHIFT+SCREEN 3": "Merge",
+   "SCREEN 1|SCREEN 1": "Amp Env текущей части"
+  },
+  "does": "Нарезка: сэмпл на выбранном пэде сам режется на части (по умолчанию по порогу громкости), и пэды играют части. K3 — способ: Threshold, Regions 4/8/16 (поровну) или Manual (стучите пэды под музыку — до 16 частей); ⇧K3 — порог. ⇧B1 Extract — выбранная часть становится новым сэмплом на свободном пэде (оригинал цел), ⇧B2 Split — делит часть пополам, ⇧B3 Merge — склеивает с предыдущей, ERASE + пэд — убирает часть. Правки частей не отменяются Undo. Выход — снова CHOP.",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/pad_play.htm"
+ },
+ "MUTE": {
+  "screen": "остаётся экран Sample",
+  "note": "Экран не меняется. По названию это режим глушения пэдов; удары по пэдам обход не делал, лампы на снимках не видны. SHIFT + MUTE — UNMUTE ALL (напечатано на панели).",
+  "does": "Режим глушения: пэды больше не играют, а глушат и включают звуки (красный — заглушён, жёлтый — звучит). Ноты в секвенции не удаляются — удобно в живом исполнении. Можно держать MUTE — режим работает, пока кнопка нажата. Работает в любом режиме.",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/pad_play.htm"
+ },
+ "LOOP": {
+  "screen": "Sample: включается петля",
+  "note": "Экран не меняется, у имени сэмпла загорается голубой значок петли (третий). Повторное LOOP выключает. SHIFT + LOOP — REVERSE (напечатано на панели).",
+  "does": "Петля для звука выбранного пэда: удар запускает сэмпл, дойдя до конца, он возвращается к точке петли (K3 на Trim) и играет дальше; повторный удар останавливает. По умолчанию включён Loop Lock — начало петли совпадает с началом сэмпла.",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/pad_play.htm"
+ },
+ "16 LEVELS": {
+  "screen": "Sample: включается 16 Levels",
+  "note": "Экран не меняется, значок «16» у имени сэмпла становится белым. Повторное нажатие выключает. SHIFT + 16 LEVELS — TYPE (напечатано на панели).",
+  "does": "Один сэмпл раскладывается на все 16 пэдов, и от пэда к пэду меняется выбранный параметр: громкость (Velocity), срез фильтра (Filter) или высота (Tune, исходная высота на пэде 4). Тип меняется SHIFT + 16 LEVELS.",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/pad_play.htm"
+ },
+ "SAMPLE SELECT": {
+  "screen": "Sample Select: браузер сэмплов",
+  "keys": [
+   "Back (внутри папки)",
+   "Internal (выбор накопителя)",
+   "Preview (внутри папки)"
+  ],
+  "data": "поворот выбирает строку, нажатие открывает папку (в папке — выбирает файл)",
+  "note": "Внизу путь (Samples/808), сверху накопитель. В корне SCREEN 1–3 ничего не делают.",
+  "steps": {
+   "DATA": "открыта папка 808: Back, Internal, Preview",
+   "turn:1": "выбрана следующая строка"
+  },
+  "does": "Браузер: выбрать сэмпл на текущий пэд со внутренней памяти или с microSD. Колесо или −/+ — по списку, нажатие колеса — открыть папку или загрузить; B1 — назад, B2 — Internal или карта (на карте папка MPC-Sample/Samples), B3 — автопрослушивание выделенного файла.",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/loading_and_saving_samples.htm"
+ },
+ "TAP TEMPO": {
+  "screen": "остаётся экран Sample",
+  "note": "Одно нажатие видимых изменений не даёт: темп задают несколькими нажатиями подряд (обход этого не делал). SHIFT + TAP TEMPO — METRO (напечатано на панели).",
+  "does": "Стучите в ритм — задаётся темп проекта. Если держать TAP TEMPO и крутить колесо, открывается окно BPM для точной настройки.",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/features.htm"
+ },
+ "MINUS": {
+  "screen": "остаётся экран Sample",
+  "note": "MINUS уменьшает на шаг параметр в рамке; Start уже в нуле, поэтому видимых изменений нет. SHIFT + MINUS — UNDO (напечатано на панели).",
+  "does": "Уменьшает выбранный параметр на шаг или двигает вниз по списку.",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/features.htm"
+ },
+ "PLUS": {
+  "screen": "остаётся экран Sample: шаг параметра +1",
+  "note": "PLUS увеличивает на шаг параметр в рамке: на снимке сдвинулся Start (метка у начала волны). SHIFT + PLUS — REDO (напечатано на панели).",
+  "does": "Увеличивает выбранный параметр на шаг или двигает вверх по списку.",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/features.htm"
+ },
+ "SAMPLE RECORD": {
+  "screen": "Sample Record: «Tap pad to record»",
+  "keys": [
+   "мониторинг входа: On → Off",
+   "–",
+   "–"
+  ],
+  "knobs": [
+   "источник: Resample (сегменты: входы)",
+   "Free (длина записи)",
+   "Thresh (порог старта)"
+  ],
+  "note": "Удар по пэду выбирает, куда записывать. Сверху слева мониторинг (On / Off / Auto), справа значок порога. SHIFT + SCREEN 1 ставит мониторинг в Auto.",
+  "steps": {
+   "SCREEN 1": "мониторинг Off",
+   "SHIFT+SCREEN 1": "мониторинг Auto"
+  },
+  "does": "Запись своих сэмплов. B1 — прослушка входа (Off, Auto — только на этом экране, On). K1 — источник: встроенный микрофон, задние входы (стерео или L/R), Resample (то, что играет сам MPC), USB. K2 — длина: Free или длина секвенции (Seq). K3 — порог: запись стартует, когда звук громче. Удар по пэду начинает запись на этот пэд, удары по другим пэдам ставят разрезы, повторный удар, STOP или SAMPLE RECORD останавливают.",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/sample_record_mode.htm"
+ },
+ "SEQ RECORD": {
+  "screen": "остаётся текущий экран, запись наготове",
+  "note": "Экран не меняется; маленькая метка в левом верхнем углу экрана из зелёной становится красной (запись секвенции наготове, обычно стартует с PLAY). Внутри работают вкладки Sample. SHIFT + SEQ RECORD — RECALL (напечатано на панели).",
+  "does": "Запись секвенции: кнопка мигает — запись наготове, пэды переходят в режим игры сэмплов. PLAY начинает запись; дойдя до конца, MPC продолжает дописывать по кругу (overdub). Снова SEQ RECORD — запись стоп, игра продолжается; STOP — стоп всего. Во время записи ручки и фейдер пишут автоматизацию; ⇧− отменяет всё записанное с начала записи.",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/recording_sequences.htm"
+ },
+ "PLAY": {
+  "screen": "остаётся текущий экран, секвенция играет",
+  "note": "По верхнему краю экрана растёт зелёная полоса: позиция в секвенции. Экран и вкладки работают как обычно. SHIFT + PLAY — CONTINUE (напечатано на панели).",
+  "does": "Запускает воспроизведение (или запись) с начала секвенции.",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/features.htm"
+ },
+ "STOP": {
+  "screen": "остаётся текущий экран",
+  "note": "Останавливает воспроизведение. SHIFT + STOP во время воспроизведения останавливает и возвращает позицию в начало (001.01, проверено на экране Seq).",
+  "does": "Останавливает воспроизведение или запись. Быстрое двойное нажатие глушит вообще весь звук.",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/features.htm"
+ },
+ "DATA": {
+  "screen": "Sample: рамка на следующий параметр",
+  "note": "Нажатие колеса переносит рамку (какой параметр крутит DATA) на следующий: Start → End → Loop. Поворот меняет параметр в рамке. На страницах Mix, Filter и Amp Env рамка тоже ходит по K1–K3.",
+  "does": "Колесо: крутить — листать меню и менять значения, нажать — выбрать. На странице Sample нажатие выбирает, какой из параметров K1–K3 крутит колесо (и −/+).",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/sample_mode.htm"
+ },
+ "SHIFT+SAMPLE": {
+  "screen": "INPUT CONFIG: настройки записи",
+  "keys": [
+   "Back (назад на Sample)",
+   "–",
+   "–"
+  ],
+  "data": "поворот выбирает строку, нажатие — правка (строка синеет)",
+  "note": "Строки: Source (Resample), Monitor (On), Threshold (−40 dB), Rec Length (Free), Rec Input Effects (Off). Это те же настройки, что на экране SAMPLE RECORD.",
+  "steps": {
+   "SCREEN 1": "Back: экран Sample",
+   "DATA": "правка Source"
+  },
+  "does": "INPUT CONFIG — откуда и как записывать: Source (микрофон, задние входы, Resample, USB), Monitor (Off/Auto/On), Threshold (−96…0 дБ, порог старта), Rec Length (Free или длина секвенции), Rec Input Effects (писать ли в сэмпл звук Knob FX). Кроме последнего, всё дублируется на экране Sample Record.",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/input_configuration.htm"
+ },
+ "SHIFT+SEQ": {
+  "screen": "STEP EDIT: список событий секвенции",
+  "keys": [
+   "–",
+   "–",
+   "Erase (удалить событие)"
+  ],
+  "knobs": [
+   "2 Bars",
+   "Q 1/16",
+   "Velocity"
+  ],
+  "note": "Сверху темп, номер секвенции и позиция (002.03.240), в середине события (тут «No Events»).",
+  "does": "STEP EDIT — правка нот по шагам. Колесо — по шагам сетки Q, −/+ или удар по пэду — выбрать ноту на шаге, фейдер — сдвинуть ноту чуть раньше или позже, K3 — её сила удара, B3 — удалить ноту; K1 длина, K2 сетка; держать B1 + колесо — темп. ERASE + пэд — стереть все ноты этого пэда (подтвердить B3).",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/step_edit.htm"
+ },
+ "SHIFT+PAD FX": {
+  "screen": "FLEX BEAT: ритмические паттерны на пэдах",
+  "keys": [
+   "–",
+   "–",
+   "Quantize вкл/выкл"
+  ],
+  "knobs": [
+   "One Shot",
+   "–",
+   "Mix"
+  ],
+  "note": "16 пэдов — 16 паттернов (рисунки огибающих), выбранный подсвечен. Заголовок «Empty» — паттерн не задан.",
+  "steps": {
+   "SCREEN 3": "Quantize выключен"
+  },
+  "does": "FLEX BEAT — эффекты времени для всей играющей секвенции: нарезка ритма, «скретчи», трансгейт (тянут высоту, время и громкость). Пэд 1 — пусто (без эффекта), пэды 2–16 — эффекты. K1: One Shot (эффект один раз и назад на пэд 1) или Loop (повторяется, пока не выбран другой). K3 — сухой/обработанный звук. B3 — начинать эффект по ближайшей доле.",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/flex_beat.htm"
+ },
+ "SHIFT+KNOB FX": {
+  "screen": "FX SELECT: выбор эффекта для Knob FX",
+  "keys": [
+   "–",
+   "All Pads (на что действует)",
+   "Bypass вкл/выкл"
+  ],
+  "knobs": [
+   "Frequency (параметр 1 эффекта)",
+   "Resonance",
+   "–"
+  ],
+  "data": "поворот листает 28 эффектов, выбранный становится Knob FX",
+  "note": "Заголовок — текущий эффект (LP Filter). Список: фильтры, компрессоры, Transient, Noise Gate, дисторшн, модуляция, эмуляторы, задержки, ревербы.",
+  "steps": {
+   "SCREEN 3": "Bypass: ручки эффекта гаснут",
+   "SHIFT+SCREEN 1": "Bypass включается и выключается"
+  },
+  "does": "FX SELECT — какой эффект будет на ручках Knob FX и к каким пэдам он применяется. Колесо или −/+ — список эффектов, нажатие колеса — загрузить. Удар по пэду включает Knob FX для этого пэда (яркий — включён); B2 — для всех пэдов; B3 — обход эффекта.",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/knob_fx.htm"
+ },
+ "SHIFT+ERASE": {
+  "screen": "COPY: на экране без изменений",
+  "note": "Экран Sample не меняется. Copy на MPC Sample — копирование пэда: выбор источника и цели идёт пэдами (обход пэды не нажимал).",
+  "does": "COPY — копирование сэмпла или секвенции. Держа SHIFT + ERASE, нажмите пэды-цели (они краснеют, повторное нажатие снимает); отпустите — выбранный пэд скопирован на них.",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/features.htm"
+ },
+ "SHIFT+NOTE REPEAT": {
+  "screen": "Note Repeat (TRIPLET)",
+  "keys": [
+   "1/8",
+   "1/16",
+   "1/32"
+  ],
+  "note": "Открывается та же строка частот, что у NOTE REPEAT; на панели это TRIPLET, но подписи частот на экране те же (тройные доли по снимку не отличить).",
+  "does": "TRIPLET: пока Note Repeat включён, с зажатым SHIFT кнопки B1–B3 выбирают триольные доли.",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/features.htm"
+ },
+ "SHIFT+PAD BANK": {
+  "screen": "остаётся экран Sample",
+  "note": "Банк пэдов назад (H → G → …). На экране не видно.",
+  "does": "Предыдущий банк пэдов.",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/features.htm"
+ },
+ "SHIFT+CHOP": {
+  "screen": "Sample: NOTE ON",
+  "note": "Первый значок у имени сэмпла (нота) становится белым: режим Note On включён. Повтор SHIFT + CHOP выключает.",
+  "does": "NOTE ON для звука пэда: звучит только пока пэд нажат, отпустили — стоп. Без него звук играет целиком (One Shot). В режиме Note On в огибающих вместо Decay появляется Release.",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/pad_play.htm"
+ },
+ "SHIFT+MUTE": {
+  "screen": "UNMUTE ALL: «All Mutes Off»",
+  "note": "Всплывает «All Mutes Off»: все заглушённые пэды включаются. Экран под ним остаётся.",
+  "does": "UNMUTE ALL: включает все заглушённые пэды разом.",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/pad_play.htm"
+ },
+ "SHIFT+LOOP": {
+  "screen": "REVERSE: сэмпл задом наперёд",
+  "note": "Второй значок у имени сэмпла (стрелка) становится белым: Reverse включён. Повтор выключает.",
+  "does": "REVERSE: звук пэда играет задом наперёд — от конца к началу (или к точке петли, если петля включена).",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/pad_play.htm"
+ },
+ "SHIFT+16 LEVELS": {
+  "screen": "TYPE: тип 16 Levels",
+  "note": "Всплывает «16 Level: Velocity»: нажатия выбирают, чем различаются пэды в режиме 16 LEVELS (на снимке Velocity, остальные типы обход не листал).",
+  "does": "TYPE: что меняется по 16 пэдам в режиме 16 LEVELS — Velocity, Filter или Tune.",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/pad_play.htm"
+ },
+ "SHIFT+SAMPLE SELECT": {
+  "screen": "SAVE SAMPLE: сохранить сэмпл под именем",
+  "keys": [
+   "Cancel",
+   "Erase (стереть символ)",
+   "Do It! (сохранить)"
+  ],
+  "data": "поворот меняет символ под курсором, нажатие — следующий символ",
+  "note": "Поле «Create name» с именем сэмпла, внизу куда сохранять (Internal). Do It! сохраняет файл и показывает «Sample Saved: Saved as …».",
+  "steps": {
+   "SCREEN 3": "Do It!: «Sample Saved», файл записан",
+   "SCREEN 1": "Cancel: обратно на Sample",
+   "SCREEN 2": "Erase: стирается символ"
+  },
+  "does": "SAVE SAMPLE — сохранить сэмпл выбранного пэда файлом. Колесо — буква, нажатие колеса — следующая буква, ⇧ — заглавные, −/+ — курсор, B2 — стереть букву (⇧B2 — всё), B3 Do It! — сохранить, B1 — отмена.",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/loading_and_saving_samples.htm"
+ },
+ "SHIFT+TAP TEMPO": {
+  "screen": "METRO: метроном вкл/выкл",
+  "note": "Всплывает «Metronome Off» / «On» / «Record»: каждое нажатие — следующее состояние.",
+  "does": "METRO: метроном по кругу — Off, On (на игре и записи), Record (только на записи). Громкость — ⇧K3 на экране Seq.",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/sequence_mode.htm"
+ },
+ "SHIFT+MINUS": {
+  "screen": "UNDO: отмена последнего действия",
+  "note": "Всплывает «Undo: <что отменено>» (на снимке «Set Metronome»). Экран под ним остаётся.",
+  "does": "UNDO: отменяет последнее действие.",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/features.htm"
+ },
+ "SHIFT+PLUS": {
+  "screen": "REDO: повтор отменённого",
+  "note": "Всплывает «Redo: <что повторено>» (на снимке «Set Metronome»).",
+  "does": "REDO: возвращает отменённое.",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/features.htm"
+ },
+ "SHIFT+SAMPLE RECORD": {
+  "screen": "RECALL: вернуть последнюю запись",
+  "note": "Всплывает «Sample Recall: Recalled into A04»: последнее записанное (на Sample Record) кладётся на свободный пэд.",
+  "does": "RECALL: последние 25 секунд звука с выбранного входа кладутся на следующий свободный пэд — если прозевали удачный момент.",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/sample_record_mode.htm"
+ },
+ "SHIFT+SEQ RECORD": {
+  "screen": "RECALL (секвенция): на экране без изменений",
+  "note": "На экране Sample видимых изменений нет.",
+  "does": "RECALL для секвенции: всё, что вы сыграли на пэдах за последний круг воспроизведения, дописывается в секвенцию.",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/recording_sequences.htm"
+ },
+ "SHIFT+PLAY": {
+  "screen": "CONTINUE: продолжить с места остановки",
+  "note": "Воспроизведение продолжается с той позиции, где остановилось (зелёная полоса сверху растёт не с нуля).",
+  "does": "CONTINUE: продолжить с текущей позиции (в Song — с выделенной секвенции).",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/song_mode.htm"
+ },
+ "SHIFT+STOP": {
+  "screen": "остаётся текущий экран",
+  "note": "При остановленном транспорте видимых изменений нет. Во время воспроизведения SHIFT + STOP останавливает и возвращает позицию в начало (проверено на экране Seq).",
+  "does": "Отдельной функции у SHIFT + STOP в руководстве нет.",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/features.htm"
+ },
+ "SHIFT+PAD 2": {
+  "screen": "HALF SEQ: «Seq A01 halved»",
+  "note": "Всплывает «Half Seq: Seq A01 halved»: секвенция укорачивается вдвое. Экран под ним остаётся.",
+  "does": "HALF SEQ: секвенция вдвое короче (4 такта → 2).",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/editing_sequences.htm"
+ },
+ "SHIFT+PAD 3": {
+  "screen": "DOUBLE SEQ: «Seq A01 doubled»",
+  "note": "Секвенция удлиняется вдвое (повтором). Всплывающее окно поверх текущего экрана.",
+  "does": "DOUBLE SEQ: секвенция вдвое длиннее, ноты копируются (4 такта → 8).",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/editing_sequences.htm"
+ },
+ "SHIFT+PAD 4": {
+  "screen": "COUNT-IN: отсчёт перед записью",
+  "note": "Всплывает «Count-In: Disabled» / «Enabled»: каждое нажатие переключает отсчёт.",
+  "does": "COUNT-IN: один такт отсчёта перед записью (значок 1234 красный — включено).",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/sequence_mode.htm"
+ },
+ "SHIFT+PAD 5": {
+  "screen": "COMPRESSOR: мастер-компрессор",
+  "keys": [
+   "Color вкл/выкл (окраска звука)",
+   "–",
+   "Bypass вкл/выкл"
+  ],
+  "knobs": [
+   "Attack",
+   "Release",
+   "Amount"
+  ],
+  "note": "Отдельный экран с картинкой и индикаторами уровня справа. В Bypass персонаж «спит», индикаторы гаснут. В проекте это эффект Color Compressor на мастере.",
+  "steps": {
+   "SCREEN 1": "Color включён",
+   "SCREEN 3": "Bypass: компрессор выключен",
+   "SHIFT+SCREEN 1": "без Color, в Bypass"
+  },
+  "does": "COMPRESSOR — компрессор на общем звуке, в первую очередь «качающий», но годится и как мягкий лимитер. K1 атака (0,1–150 мс), K2 восстановление (3–300 мс), K3 степень сжатия (порог и ratio в одной ручке), ⇧K3 — подъём входа (In Boost). B1 Color — «ленточная теплота»: немного баса, плавание высоты, насыщение. B3 — обход.",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/compressor.htm"
+ },
+ "SHIFT+PAD 6": {
+  "screen": "HALF SPEED: «Seq A01 event speed halved»",
+  "note": "События секвенции растягиваются вдвое (играет в два раза медленнее).",
+  "does": "HALF SPEED: ноты секвенции играют вдвое медленнее (восьмые хэты становятся четвертями).",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/editing_sequences.htm"
+ },
+ "SHIFT+PAD 7": {
+  "screen": "DOUBLE SPEED: «Seq A01 event speed doubled»",
+  "note": "События секвенции сжимаются вдвое.",
+  "does": "DOUBLE SPEED: ноты секвенции играют вдвое быстрее (восьмые → шестнадцатые).",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/editing_sequences.htm"
+ },
+ "SHIFT+PAD 8": {
+  "screen": "MIDI CONFIG: настройки MIDI",
+  "keys": [
+   "Back",
+   "–",
+   "–"
+  ],
+  "data": "поворот выбирает строку, нажатие — правка",
+  "note": "Строки: MIDI Port (External), MIDI In Channel (All), MIDI Out Channel (1), Pad MIDI In (On), Pad MIDI Out (Always), MIDI Sync In (Off), MIDI Sync Out (MIDI Clock). Справа версия v1.3.0. Pad MIDI In и MIDI Sync Out в этой лаборатории были включены заранее.",
+  "does": "MIDI CONFIG: порт MIDI (разъёмы или USB), каналы входа и выхода, играют ли пэды от MIDI и шлют ли MIDI, синхронизация (MIDI Clock или MTC) на вход и выход, MIDI Thru, Program Change для смены секвенций, CV-синхро на SYNC OUT. Здесь же Takeover — как ручки и фейдер подхватывают значение: Pickup (ждёт совпадения), Scaled (догоняет плавно, по умолчанию для ручек) или Instant (прыгает сразу). И сброс настроек или всех данных (осторожно, необратимо).",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/midi_configuration.htm"
+ },
+ "SHIFT+PAD 9": {
+  "screen": "FADER: что делает фейдер",
+  "keys": [
+   "Back",
+   "–",
+   "ON (фейдер включён)"
+  ],
+  "data": "поворот выбирает назначение, нажатие — выбрать",
+  "note": "Список назначений фейдера: Pad Volume, Pad Pan, Pad Tune, Pad Amp Attack, Pad Amp Decay, Pad Filter Cutoff, Kit Volume…",
+  "does": "FADER — что двигает фейдер: громкость, панораму, высоту, атаку или спад/release пэда, срез фильтра или громкость всего кита. B3 включает и выключает фейдер. Яркость его лампы показывает значение: если позиция фейдера не совпадает со значением, двигайте его, пока лампа не начнёт меняться.",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/fader.htm"
+ },
+ "SHIFT+PAD 10": {
+  "screen": "REC QUANTIZE: квантование записи",
+  "note": "Всплывает «Rec Quantize: Off» / «On»: переключает квантование при записи (то же, что Rec Quant на экране Seq).",
+  "does": "REC QUANTIZE: всё записанное сразу ложится на сетку Q.",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/editing_sequences.htm"
+ },
+ "SHIFT+PAD 11": {
+  "screen": "RESAMPLE: «Resample Seq: Select pad»",
+  "keys": [
+   "Cancel",
+   "–",
+   "–"
+  ],
+  "note": "Запись секвенции в сэмпл: нужно ударить пэд, куда записать. SCREEN 1 отменяет.",
+  "does": "RESAMPLE: вся секвенция записывается в новый сэмпл на пэд, который вы ударите. Освобождает пэды и позволяет «запечь» бит.",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/editing_sequences.htm"
+ },
+ "SHIFT+PAD 12": {
+  "screen": "SONG: песня из секвенций",
+  "keys": [
+   "Export",
+   "Remove",
+   "Insert"
+  ],
+  "note": "Экран песни из секвенций; в этом проекте «Empty Song». Кнопки: Export, Remove, Insert (их работу обход не проверял — песня пустая).",
+  "does": "SONG — песня из секвенций: пэд выбирает секвенцию, B3 вставляет её в список, колесо или −/+ — по списку, B2 удаляет, PLAY играет песню с начала. B1 — экспорт: в аудиофайл (с именем) или в новую секвенцию проекта.",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/song_mode.htm"
+ },
+ "SHIFT+PAD 1": {
+  "screen": "FULL LEVEL: «Full Level Enabled»",
+  "note": "Всплывает «Full Level: Enabled» / «Disabled»: пэды играют на полной громкости, независимо от силы удара.",
+  "does": "FULL LEVEL: все пэды играют на полной силе, как ни бей.",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/features.htm"
+ },
+ "SHIFT+PAD 13": {
+  "screen": "TRIM SAMPLE: на экране без изменений",
+  "note": "На экране видимых изменений нет.",
+  "does": "TRIM SAMPLE: отрезает у сэмпла всё до точки Start и после End.",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/features.htm"
+ },
+ "SHIFT+PAD 14": {
+  "screen": "TIME CORRECT: квантование сыгранного",
+  "keys": [
+   "Cancel",
+   "All (все пэды)",
+   "Do It!"
+  ],
+  "knobs": [
+   "Q 1/8 (сетка)",
+   "Shift",
+   "Swing"
+  ],
+  "note": "Сетка пэдов A1–A16: какие пэды выровнять. Do It! выравнивает события секвенции по сетке Q.",
+  "does": "TIME CORRECT — выровнять уже записанные ноты. Пэдами выбираете, чьи ноты (B2 — все), K1 сетка Q, K2 Shift — сдвиг вперёд или назад для «живости», K3 Swing — «шаффл». B3 Do It! применяет, ⇧− отменяет. Q и Swing общие для проекта.",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/time_correct.htm"
+ },
+ "SHIFT+PAD 15": {
+  "screen": "WARP: «Warp: Time stretch»",
+  "note": "Всплывает «Warp: Time stretch» (следующее нажатие — Pitch).",
+  "does": "WARP: переключает режим Warp между Time Stretch (меняется длина и темп, высота та же) и Pitch (длина и высота меняются вместе). Само значение Warp — K3 на вкладке Tune.",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/sample_mode.htm"
+ },
+ "SHIFT+PAD 16": {
+  "screen": "PROJECT: проекты",
+  "keys": [
+   "Back",
+   "–",
+   "–"
+  ],
+  "data": "поворот выбирает строку, нажатие открывает",
+  "note": "Меню: Load Project, Save Project, New Project, SD Card Access. Load Project открывает браузер проектов (Internal: Demos, Kits, User).",
+  "steps": {
+   "DATA": "Load Project: браузер Projects (Demos, Kits, User)"
+  },
+  "does": "PROJECT: Load Project (Demos, Kits — кит с четырьмя секвенциями, B3 Load Kit — только звуки, User), Save Project (имя, B3 Do It!), New Project, SD Card Access — карта microSD видна компьютеру по USB (перед выходом извлеките её на компьютере). MPC и так сохраняет проект сам в фоне.",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/project.htm"
+ },
+ "SHIFT+DATA": {
+  "screen": "Sample: рамка на предыдущий параметр",
+  "note": "SHIFT + нажатие колеса переносит рамку назад (Start → Loop), без SHIFT — вперёд.",
+  "does": "На странице Sample — выбор параметра для колеса в обратную сторону.",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/sample_mode.htm"
+ }
+}

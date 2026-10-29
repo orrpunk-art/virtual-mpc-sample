@@ -1,0 +1,42 @@
+Reproduce the inMusic 6.12.60-imb behaviour of snd-serial-generic: the card and its
+rawmidi port are named after the DT "label" property ("Control Surface",
+"External MIDI"). Inferred from the stock module's strings ("got label %s",
+"%s at serial%d", no "Serial MIDI %d-%d" format); the application and midifirmup
+look the port up by that name.
+
+
+--- a/sound/drivers/serial-generic.c	2026-10-27 10:23:38.015797883 +0000
++++ b/sound/drivers/serial-generic.c	2026-10-27 10:23:38.039269092 +0000
+@@ -264,6 +264,7 @@
+ static void snd_serial_generic_parse_dt(struct serdev_device *serdev,
+ 				struct snd_serial_generic *drvdata)
+ {
++	const char *label;
+ 	int err;
+ 
+ 	err = of_property_read_u32(serdev->dev.of_node, "current-speed",
+@@ -275,6 +276,14 @@
+ 		drvdata->baudrate = 38400;
+ 	}
+ 
++	if (of_property_read_string(serdev->dev.of_node, "label", &label) < 0) {
++		dev_dbg(drvdata->card->dev, "failed to read label\n");
++		return;
++	}
++	dev_dbg(drvdata->card->dev, "got label %s\n", label);
++	strscpy(drvdata->card->shortname, label, sizeof(drvdata->card->shortname));
++	snprintf(drvdata->card->longname, sizeof(drvdata->card->longname),
++		 "%s at serial%d", label, serdev->ctrl->nr);
+ }
+ 
+ static void snd_serial_generic_substreams(struct snd_rawmidi_str *stream, int dev_num)
+@@ -282,7 +291,8 @@
+ 	struct snd_rawmidi_substream *substream;
+ 
+ 	list_for_each_entry(substream, &stream->substreams, list) {
+-		sprintf(substream->name, "Serial MIDI %d-%d", dev_num, substream->number);
++		strscpy(substream->name, substream->rmidi->card->shortname,
++			sizeof(substream->name));
+ 	}
+ }
+ 

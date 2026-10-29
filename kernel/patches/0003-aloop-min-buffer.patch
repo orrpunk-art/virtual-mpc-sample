@@ -1,0 +1,34 @@
+snd-aloop: optional min_buffer parameter (lab only).
+
+MPC Sample asks for 128-frame periods in a 384-frame buffer (8.7 ms). Inside a VM the guest
+is sometimes held up longer than the ~6 ms of headroom that leaves, and every miss makes the
+app recover and restart its linked streams: a click. snd_aloop.min_buffer=N (frames) on the
+kernel command line gives the app at least N frames of buffer, at N/44.1 ms of output latency.
+(A minimum period count does not help: the app then picks smaller periods in the same 384.)
+Default 0 = stock behaviour. Applies on top of 0002.
+
+--- a/sound/drivers/aloop.c	2026-10-27 12:53:39.159058216 +0000
++++ b/sound/drivers/aloop.c	2026-10-27 12:53:39.176562424 +0000
+@@ -57,6 +57,9 @@
+ MODULE_PARM_DESC(pcm_notify, "Break capture when PCM format/rate/channels changes.");
+ module_param_array(timer_source, charp, NULL, 0444);
+ MODULE_PARM_DESC(timer_source, "Sound card name or number and device/subdevice number of timer to be used. Empty string for jiffies timer [default].");
++static int min_buffer;
++module_param(min_buffer, int, 0444);
++MODULE_PARM_DESC(min_buffer, "Minimum buffer size in frames (0 = no limit) [default 0].");
+ 
+ #define NO_PITCH 100000
+ 
+@@ -1290,6 +1293,12 @@
+ 	}
+ 
+ 	snd_pcm_hw_constraint_integer(runtime, SNDRV_PCM_HW_PARAM_PERIODS);
++	if (min_buffer > 0) {
++		err = snd_pcm_hw_constraint_minmax(runtime, SNDRV_PCM_HW_PARAM_BUFFER_SIZE,
++						   min_buffer, UINT_MAX);
++		if (err < 0)
++			goto unlock;
++	}
+ 
+ 	/* use dynamic rules based on actual runtime->hw values */
+ 	/* note that the default rules created in the PCM midlevel code */

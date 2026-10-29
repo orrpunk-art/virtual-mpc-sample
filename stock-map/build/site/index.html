@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MPC Sample Stock Map</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;700&family=IBM+Plex+Sans:wght@400;600&family=IBM+Plex+Mono:wght@500&display=swap">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="top">
+  <div class="bar">
+    <h1 id="title"></h1>
+    <div class="tools">
+      <input id="find" type="search" autocomplete="off">
+      <div class="lang" role="group" aria-label="Language">
+        <button type="button" data-lang="ru">RU</button><button type="button" data-lang="en">EN</button><button type="button" data-lang="zh">中文</button>
+      </div>
+    </div>
+  </div>
+</header>
+<main>
+  <p class="lede" id="lede"></p>
+  <section class="kinds" id="kinds"></section>
+  <nav class="toc" id="toc"></nav>
+  <div id="entries"></div>
+  <footer id="foot"></footer>
+</main>
+<div id="zoom" hidden><img alt=""></div>
+<script src="data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

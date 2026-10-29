@@ -1,0 +1,841 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Virtual MPC Sample</title>
+<style>
+:root {
+  --body: #dcdad4; --body-edge: #b9b7b0; --band: #151515; --sub: #3c3c3c;
+  --btn: #3a3a3a; --btn-top: #4b4b4b; --orange: #e0662c; --blue: #4a7fd8; --red: #e0342b;
+  --bg: #26282c; --panel-bg: #1d1f23; --text: #e8e8e8; --muted: #9aa0a6; --line: #3a3d43;
+  --midi: #f0a030; --audio: #4aa3ff; --sync: #c07cff;
+}
+@media (prefers-color-scheme: light) { :root:not([data-theme="dark"]) { --bg: #e9e7e2; --panel-bg: #f7f6f3; --text: #1e1e1e; --muted: #666; --line: #d4d1ca; } }
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; background: var(--bg); color: var(--text);
+  font: 12px -apple-system, "Helvetica Neue", Arial, sans-serif; }
+/* the sampler grows with the window up to 1200 px wide; sampler and rack stay centred.
+   The scrollbar's room is kept from the start, so the size fit() picks still fits once the
+   page grows long enough to scroll */
+html { scrollbar-gutter: stable; }
+body { display: flex; min-height: 100%; justify-content: center; }
+#stage { flex: 0 1 1216px; display: flex; flex-direction: column; align-items: center; gap: 14px; padding: 14px 8px 20px; min-width: 0; }
+#rack { width: 360px; box-sizing: border-box; flex: none; padding: 12px; display: flex; flex-direction: column; gap: 10px; overflow-y: auto; max-height: 100vh; position: sticky; top: 0; }
+@media (max-width: 900px) { body { flex-direction: column; } #rack { width: auto; max-height: none; position: static; } }
+.scaled { position: relative; flex: none; }
+.unit { position: absolute; left: 0; top: 0; transform-origin: 0 0; user-select: none; }
+.abs { position: absolute; }
+
+/* ---------------- front ---------------- */
+#mpc { width: 465px; height: 558px; background: linear-gradient(#e4e2dc, var(--body)); border-radius: 16px;
+  box-shadow: 0 0 0 2px var(--body-edge), 0 18px 40px rgba(0,0,0,.45); }
+#band { left: 7px; top: 9px; width: 451px; height: 145px; background: var(--band); border-radius: 9px; }
+.logo { color: #c8302c; font-weight: 800; font-size: 20px; letter-spacing: .5px; line-height: 1; }
+.logo small { display: block; font: italic 9.5px Georgia, serif; letter-spacing: 0; text-align: right; margin-top: 1px; }
+.model { color: #c8302c; font-weight: 800; font-size: 13.5px; letter-spacing: .3px; }
+.lbl { font-size: 5.6px; font-weight: 700; color: var(--sub); text-align: center; white-space: nowrap; transform: translateX(-50%); letter-spacing: .2px; }
+.lbl.light { color: #c9c9c9; }
+.section { font-size: 6px; font-weight: 700; color: var(--sub); letter-spacing: .6px; transform: translateX(-50%); }
+#screen { background: #000; border: 2px solid #2d2d2d; image-rendering: pixelated; object-fit: fill; }
+#screen.off { opacity: .35; }
+#poweroff { display: none; align-items: center; justify-content: center; text-align: center; background: #000; color: #9a9a9a;
+  font: 600 7px/1.5 system-ui, sans-serif; border: 2px solid #2d2d2d; box-sizing: border-box; }
+#poweroff.on { display: flex; }
+.grille { border-radius: 7px; background: radial-gradient(circle, #2e2e2e 1.1px, transparent 1.5px) 0 0 / 4.2px 4.2px, #0c0c0c; }
+.meter { border-radius: 1.5px; background: #262626; }
+/* every raised control casts the same kind of shadow (--drop); LED states draw on top of it
+   instead of replacing it, so a lit or unlit button keeps its shadow; pressed = no shadow */
+.btn { --drop: 0 1.6px 0 #111, 0 2.5px 3.5px rgba(0,0,0,.4);
+  border-radius: 3.5px; background: linear-gradient(var(--btn-top), var(--btn)); box-shadow: var(--drop), inset 0 0 0 .6px rgba(0,0,0,.4);
+  color: #eee; font-size: 5.4px; font-weight: 800; display: flex; align-items: center; justify-content: center; text-align: center;
+  line-height: 1.05; cursor: pointer; }
+.btn.white { --drop: 0 1.6px 0 #8a8a86, 0 2.5px 3.5px rgba(0,0,0,.3); background: linear-gradient(#f6f6f4, #dcdcd8); color: #222; box-shadow: var(--drop); }
+.btn.orange { background: linear-gradient(#ef7d47, var(--orange)); }
+.btn.blue { background: linear-gradient(#5c90e6, var(--blue)); }
+.btn.black { background: linear-gradient(#262626, #0d0d0d); }
+.btn.top { --drop: 0 1px 0 #000, 0 2px 3px rgba(0,0,0,.45); background: linear-gradient(#2b2b2b, #191919); box-shadow: var(--drop); }
+.btn.down { transform: translateY(.8px); box-shadow: inset 0 0 0 .6px rgba(0,0,0,.4); filter: brightness(1.15); }
+.pad.down { transform: translateY(.8px); box-shadow: inset 0 0 0 1.2px #24262a, 0 0 7px var(--glow, transparent); filter: brightness(1.15); }
+.btn .stripe { position: absolute; left: 4px; right: 4px; bottom: 2.5px; height: 1.8px; border-radius: 1px; background: #5a5a5a; }
+.btn.lit { box-shadow: var(--drop), 0 0 0 1.4px rgba(255,255,255,.9), 0 0 6px rgba(255,255,255,.5); filter: brightness(1.3); }
+.btn.dim { box-shadow: var(--drop), 0 0 0 .8px rgba(255,255,255,.45); }
+.stripe.lit { background: #ff3b30 !important; box-shadow: 0 0 4px #ff3b30; }
+.stripe.green.lit { background: #39d353 !important; box-shadow: 0 0 4px #39d353; }
+.padgrid { background: #0e0e0e; border-radius: 4px; }
+.pad { border-radius: 3.5px; background: #3b3d40; cursor: pointer;
+  box-shadow: 0 1.4px 0 #050505, 0 2.5px 3.5px rgba(0,0,0,.5), inset 0 0 0 1.2px #24262a, 0 0 7px var(--glow, transparent); }
+.padlbl { font-size: 4.6px; font-weight: 700; color: #d6d6d6; white-space: nowrap; letter-spacing: .1px; }
+.knob { border-radius: 50%; cursor: ns-resize; background: radial-gradient(circle at 40% 35%, #fbfbfb, #cfcfcb 60%, #a2a29e);
+  box-shadow: 0 2px 3px rgba(0,0,0,.5), 0 0 0 2.5px #2a2a2a; }
+.knob .ind { position: absolute; left: 50%; top: 7%; width: 2px; height: 34%; margin-left: -1px; background: #222; border-radius: 1px; transform-origin: 50% 128%; }
+.ring { border-radius: 50%; border: 1.2px solid #8d8b86; }
+.enc { border-radius: 50%; cursor: grab; background: radial-gradient(circle at 40% 35%, #fdfdfd, #d6d6d2 65%, #a8a8a4); box-shadow: 0 2px 4px rgba(0,0,0,.45); }
+.fader-slot { background: #111; border-radius: 3px; }
+.fader-cap { border-radius: 3px; cursor: ns-resize;
+  background: linear-gradient(#f6f6f4 0 44%, #8f8f8b 44% 56%, #e6e6e2 56%); box-shadow: 0 2px 3px rgba(0,0,0,.5); }
+.rest { border-radius: 10px; background: linear-gradient(#6c6c6a, #545452); }
+.led { border-radius: 1px; background: #1e3324; }
+.led.on { background: #3ce07a; box-shadow: 0 0 6px #3ce07a; }
+.unmapped { opacity: .55; }
+
+/* ---------------- rear ---------------- */
+#back { width: 465px; height: 96px; background: linear-gradient(#e2e0da, #d0cec8); border-radius: 12px;
+  box-shadow: 0 0 0 2px var(--body-edge), 0 10px 26px rgba(0,0,0,.4); }
+#back .base { left: 6px; right: 6px; bottom: 0; height: 14px; background: linear-gradient(#3b3b3d, #232325); border-radius: 0 0 10px 10px; }
+.rlbl { font-size: 4.8px; font-weight: 800; color: #b5443e; text-align: center; transform: translateX(-50%); white-space: nowrap; letter-spacing: .2px; }
+.jack { border-radius: 50%; cursor: pointer; background: radial-gradient(circle, #000 0 32%, #2c2c2c 34% 60%, #6a6a68 62% 70%, #1b1b1b 72%);
+  box-shadow: 0 0 0 1px #9c9a95; }
+.jack.big { background: radial-gradient(circle, #000 0 38%, #262626 40% 62%, #6a6a68 64% 72%, #1b1b1b 74%); }
+.jack.plugged { box-shadow: 0 0 0 1.6px var(--plug, #888), 0 0 6px var(--plug, #888); }
+.jack:hover { filter: brightness(1.6); }
+.usb { border-radius: 2px; background: #111; box-shadow: 0 0 0 1px #8a8a86, inset 0 0 0 1.4px #444; }
+.sd { border-radius: 1.5px; background: #111; box-shadow: 0 0 0 1px #8a8a86; cursor: pointer; }
+.sd.in { background: linear-gradient(#2f6fd0, #1d4f9a); box-shadow: 0 0 0 1px #8a8a86, 0 0 5px #2f6fd0; }
+#soundBadge { position: fixed; left: 8px; top: 8px; z-index: 30; padding: 5px 10px; border-radius: 6px; font-size: 12px; cursor: pointer;
+  background: #e0a030; color: #111; border: none; }
+.power { border-radius: 50%; background: radial-gradient(circle at 40% 35%, #444, #111); box-shadow: 0 0 0 1.2px #8a8a86; cursor: pointer; }
+.gain { border-radius: 50%; cursor: ns-resize; background: radial-gradient(circle at 40% 35%, #555, #151515); box-shadow: 0 0 0 1.2px #8a8a86; }
+.gain .ind { position: absolute; left: 50%; top: 8%; width: 1.6px; height: 36%; margin-left: -.8px; background: #eee; transform-origin: 50% 118%; }
+.vu { width: 3px; background: #2a2a2a; border-radius: 1px; overflow: hidden; display: flex; flex-direction: column-reverse; }
+.vu i { display: block; background: linear-gradient(to top, #3c3 0 70%, #fc3 70% 88%, #f33 88%); width: 100%; height: 0; }
+
+/* ---------------- rack ---------------- */
+.card { background: var(--panel-bg); border: 1px solid var(--line); border-radius: 8px; padding: 9px 10px; position: relative; }
+.card h4 { margin: 0 0 6px; font-size: 12px; display: flex; align-items: center; gap: 6px; }
+.card .port { width: 12px; height: 12px; border-radius: 50%; border: 2px solid var(--muted); flex: none; }
+.card .port.on { border-color: var(--c, var(--midi)); background: var(--c, var(--midi)); }
+.card .note { color: var(--muted); font-size: 11px; line-height: 1.35; }
+.status { font-size: 11px; line-height: 1.5; }
+.ok { color: #39d353; } .bad { color: #ff6b6b; } .warn { color: #e0a030; }
+#midilog { font: 10.5px ui-monospace, Menlo, monospace; height: 150px; overflow-y: auto; white-space: pre; background: rgba(0,0,0,.18); border-radius: 4px; padding: 4px; }
+.arout { font: 10.5px ui-monospace, Menlo, monospace; max-height: 220px; overflow: auto; white-space: pre-wrap; background: rgba(0,0,0,.18); border-radius: 4px; padding: 4px; margin-top: 6px; }
+.arout:empty { display: none; }
+#midilog .in { color: var(--audio); } #midilog .out { color: var(--midi); }
+.row { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; margin-top: 5px; }
+.row label { color: var(--muted); font-size: 11px; }
+button.s { font: inherit; font-size: 11px; padding: 3px 8px; border-radius: 5px; border: 1px solid var(--line); background: transparent; color: var(--text); cursor: pointer; }
+button.s:hover { border-color: var(--muted); }
+button.s.on { background: var(--midi); color: #111; border-color: var(--midi); }
+input[type=range] { width: 110px; }
+select, input[type=number] { font: inherit; font-size: 11px; background: transparent; color: var(--text); border: 1px solid var(--line); border-radius: 4px; padding: 1px 3px; }
+#keys { position: relative; height: 54px; margin-top: 6px; user-select: none; }
+#keys div { position: absolute; top: 0; cursor: pointer; border-radius: 0 0 3px 3px; }
+#keys .w { background: #f4f4f2; border: 1px solid #999; height: 54px; z-index: 1; }
+#keys .b { background: #222; height: 33px; z-index: 2; }
+#keys .down { background: var(--midi) !important; }
+.hbar { height: 6px; background: rgba(127,127,127,.2); border-radius: 3px; overflow: hidden; flex: 1; min-width: 60px; }
+.hbar i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, #3c3, #fc3 75%, #f33); }
+#menu { position: fixed; z-index: 20; background: var(--panel-bg); border: 1px solid var(--line); border-radius: 7px; padding: 4px; box-shadow: 0 8px 22px rgba(0,0,0,.4); display: none; min-width: 170px; }
+#menu div { padding: 5px 9px; border-radius: 4px; cursor: pointer; font-size: 12px; }
+#menu div:hover { background: rgba(127,127,127,.18); }
+#menu .cur::before { content: "● "; color: var(--midi); }
+#menu .hdr { color: var(--muted); cursor: default; font-size: 11px; }
+#menu .hdr:hover { background: none; }
+#cables { position: absolute; left: 0; top: 0; pointer-events: none; z-index: 10; overflow: visible; }
+#help { color: var(--muted); font-size: 11px; line-height: 1.5; }
+#help code { background: rgba(127,127,127,.18); padding: 0 3px; border-radius: 3px; color: var(--text); }
+#rackToggle { position: fixed; right: 8px; top: 8px; z-index: 30; width: 28px; height: 28px; border-radius: 6px; border: 1px solid var(--line);
+  background: var(--panel-bg); color: var(--text); cursor: pointer; font-size: 15px; line-height: 1; }
+body.norack #rack { display: none; }
+#rack { padding-top: 42px; }
+#overlay { position: absolute; opacity: .45; pointer-events: none; display: none; }
+</style>
+</head>
+<body>
+<button id="soundBadge">🔇 Sound is off: click the panel</button>
+<div id="stage">
+  <div class="scaled" id="backWrap"><div class="unit" id="back"></div></div>
+  <div class="scaled" id="frontWrap"><div class="unit" id="mpc"></div></div>
+</div>
+<button id="rackToggle" title="Show or hide the side panel">⟩</button>
+<div id="rack">
+  <div class="card"><h4>Virtual MPC Sample</h4><div class="status" id="status">connecting…</div>
+</div>
+  <div class="card" id="dev-mac"><h4><span class="port" style="--c:var(--audio)"></span>Computer speakers</h4>
+    <div class="row"><label>L</label><div class="hbar"><i id="lvOutL"></i></div></div>
+    <div class="row"><label>R</label><div class="hbar"><i id="lvOutR"></i></div></div>
+    <div class="note" id="macNote"></div></div>
+  <div class="card" id="dev-tone"><h4><span class="port" style="--c:var(--audio)"></span>Test tone → AUDIO IN</h4>
+    <div class="row"><label>Into the app</label><div class="hbar"><i id="lvIn"></i></div></div>
+    <div class="note">Patch AUDIO IN to <b>Test tone</b>, the <b>computer's input</b> or the loop cable from AUDIO OUT. REC GAIN on the back sets the level.</div></div>
+  <div class="card"><h4>App output channels</h4>
+    <div class="row"><label>1–2 main</label><div class="hbar"><i id="lvC1"></i></div></div>
+    <div class="row"><label>3–4 second</label><div class="hbar"><i id="lvC3"></i></div></div>
+    <div class="note">The app drives 4 outputs. 1–2 follow MAIN VOLUME and play on the speaker and AUDIO OUT; 3–4 carry a second mix at a fixed level, played when PHONES goes to the computer (that it is the phones mix is an assumption). SYNC OUT is not emulated.</div></div>
+  <div class="card" id="dev-monitor"><h4><span class="port"></span>MIDI monitor (MIDI OUT)</h4>
+    <div class="row"><span id="midiStat" class="note"></span><button class="s" id="midiClear">Clear</button></div>
+    <div id="midilog"></div></div>
+  <div class="card" id="dev-keyboard"><h4><span class="port"></span>MIDI keyboard (MIDI IN)</h4>
+    <div class="row"><label>ch</label><select id="kch"></select><label>vel</label><input type="range" id="kvel" min="1" max="127" value="100"><span id="kvelv" class="note">100</span></div>
+    <div id="keys"></div>
+    <div class="row"><label>CC</label><input type="number" id="ccn" min="0" max="127" value="1" style="width:46px"><input type="range" id="ccv" min="0" max="127" value="0"><span id="ccvv" class="note">0</span></div>
+    <div class="row"><button class="s" id="mStart">Start</button><button class="s" id="mStop">Stop</button><button class="s" id="mClock">Clock 120</button><button class="s" id="mPanic">All notes off</button></div>
+    <div class="note" style="margin-top:6px">For the MPC to play from this keyboard: SHIFT + pad 8 (MIDI CONFIG), MIDI Port = <b>External</b>, Pad MIDI In = <b>On</b>. By default the MPC listens to USB only.</div></div>
+  <div class="card" id="dev-autorun"><h4><span class="port"></span>SD autorun packages</h4>
+    <div class="note">A zip with an <code>autorun/</code> folder (a root-SSH package, a mod, your own script). The lab makes an exFAT card labelled MPCSAMPLE from it with the firmware's own fdisk/mkfs.exfat and inserts it, as a user would.</div>
+    <div class="row"><input type="file" id="arZip" accept=".zip,application/zip"></div>
+    <div class="row"><label><input type="checkbox" id="arReboot" checked> power-cycle the MPC with the card in (runs at power-on, like the device)</label></div>
+    <div class="row"><label><input type="checkbox" id="arYes"> answer Yes in the script's question</label></div>
+    <div class="row"><button class="s" id="arRun">Run</button><button class="s" id="arResults">Results</button></div>
+    <div id="arOut" class="arout"></div></div>
+  <div class="card"><div id="help"></div></div>
+</div>
+<div id="menu"></div>
+<svg id="cables"></svg>
+<script>
+// ===================================================================== layout
+// Units are measured on top-view photos (front 465 x 558, rear 465 x 96). Control names
+// match panel/controls.json, which holds the MIDI frames each control sends to the app.
+const PAD_SHIFT = ["FULL LEVEL","HALF SEQ","DOUBLE SEQ","COUNT-IN","COMPRESSOR","HALF SPEED","DOUBLE SPEED","MIDI CONFIG",
+  "FADER","REC QUANTIZE","RESAMPLE","SONG","TRIM SAMPLE","TIME CORRECT","WARP","PROJECT"];
+const B = (name, x, y, label, sub, cls = "", w = 31, h = 18) => ({ name, x, y, w, h, label, sub, cls });
+const L = {   // front geometry (unit = 1/465 of the panel width)
+  band: [7, 9, 451, 145], screen: [178, 62, 112, 85], grille: [355, 55, 80, 87],
+  meter: { x: 326, y: 64, dx: 12, dy: 15.5, w: 8, h: 11 },
+  vol: [62, 106, 21], bank: [113, 107], bankLed: [113, 140],
+  pads: { x: 122, y: 243, step: 57.5, size: 50.5 }, padArea: [117, 238, 233, 240],
+  knobs: { x: 147, y: 211, dx: 86.5, r: 18 }, fader: { x: 64, top: 300, len: 128 },
+  enc: [404, 330, 22], rest: [6, 486, 453, 66],
+};
+const BUTTONS = [
+  B("SCREEN 1", 179, 30, "", "", "top", 28, 13), B("SCREEN 2", 220, 30, "", "", "top", 28, 13), B("SCREEN 3", 261, 30, "", "", "top", 28, 13),
+  B("SAMPLE", 23, 183, "SAMPLE", "INPUT CONFIG", "white"), B("SEQ", 70, 183, "SEQ", "STEP EDIT"),
+  B("PAD FX", 23, 213, "PAD<br>FX", "FLEX BEAT", "orange"), B("KNOB FX", 70, 213, "KNOB<br>FX", "FX SELECT", "orange"),
+  B("SHIFT", 22, 252, "", "SHIFT", "black", 33, 22), B("PAD BANK", 70, 254, "PAD<br>BANK", ""),
+  B("ERASE", 23, 449, "ERASE", "COPY"), B("NOTE REPEAT", 70, 449, "NOTE<br>REPEAT", "TRIPLET"),
+  B("CHOP", 368, 183, "CHOP", "NOTE ON", "blue"), B("MUTE", 415, 183, "MUTE", "UNMUTE ALL", "blue"),
+  B("LOOP", 368, 213, "LOOP", "REVERSE", "blue"), B("16 LEVELS", 415, 213, "16<br>LEVELS", "TYPE", "blue"),
+  B("SAMPLE SELECT", 368, 254, "SAMPLE<br>SELECT", "SAVE SAMPLE"), B("TAP TEMPO", 415, 254, "TAP<br>TEMPO", "METRO"),
+  B("MINUS", 368, 368, "−", "UNDO"), B("PLUS", 415, 368, "+", "REDO"),
+  B("SAMPLE RECORD", 368, 410, "SAMPLE<br>RECORD", "RECALL", "stripe-red"), B("SEQ RECORD", 415, 410, "SEQ<br>RECORD", "RECALL", "stripe-red"),
+  B("STOP", 368, 446, "■", "", "stripe-white"), B("PLAY", 415, 446, "▶", "CONTINUE", "stripe-green"),
+];
+// rear, left to right as on the device
+const REAR = [
+  { jack: "PHONES", x: 48, label: "PHONES", r: 6, kind: "audio" },
+  { jack: "SYNC OUT", x: 77, label: "SYNC<br>OUT", r: 6, kind: "sync" },
+  { jack: "MIDI OUT", x: 104, label: "OUT", r: 6, kind: "midi" },
+  { jack: "MIDI IN", x: 132, label: "IN", r: 6, kind: "midi" },
+  { jack: "AUDIO OUT", x: 167, label: "R", r: 9, kind: "audio" }, { jack: "AUDIO OUT", x: 205, label: "L/M", r: 9, kind: "audio" },
+  { jack: "AUDIO IN", x: 252, label: "R", r: 9, kind: "audio" }, { jack: "AUDIO IN", x: 291, label: "L/M", r: 9, kind: "audio" },
+];
+const TARGETS = {   // what a rear jack can be patched to -> name of the rack card / text
+  none: "Unplugged", mac: "Computer speakers", monitor: "MIDI monitor", keyboard: "MIDI keyboard",
+  loop: "Loop cable (OUT → IN)", tone: "Test tone", input: "Computer audio input (run with --audio-in)",
+};
+const TARGET_CARD = { mac: "dev-mac", monitor: "dev-monitor", keyboard: "dev-keyboard", tone: "dev-tone" };
+const KIND_COLOUR = { midi: "var(--midi)", audio: "var(--audio)", sync: "var(--sync)" };
+
+// ===================================================================== helpers
+const $ = id => document.getElementById(id);
+let MAP = { controls: {} }, STATE = null, scale = 1, encAcc = 0, midiSeen = 0;
+const pos = {};       // absolute control positions 0..1
+const controls = {};  // name -> element
+const jacks = {};     // jack name -> [elements]
+function el(parent, cls, x, y, w, h, html = "") {
+  const d = document.createElement("div");
+  d.className = "abs " + cls;
+  Object.assign(d.style, { left: x + "px", top: y + "px" });
+  if (w != null) d.style.width = w + "px";
+  if (h != null) d.style.height = h + "px";
+  d.innerHTML = html;
+  parent.appendChild(d);
+  return d;
+}
+async function post(path, body) {
+  try {
+    const r = await fetch(path, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+    return r.ok ? r.json() : null;
+  } catch { return null; }
+}
+// ===================================================================== link to the server
+// One WebSocket carries everything time-critical, in order: controls out; screen frames
+// (from QEMU's VNC), state and sound in. Plain HTTP stays as the fallback.
+let ws = null, lastFrame = 0;
+function wsSend(m) {
+  if (ws && ws.readyState === 1) { ws.send(typeof m === "string" || m instanceof ArrayBuffer ? m : JSON.stringify(m)); return true; }
+  return false;
+}
+function connect() {
+  ws = new WebSocket(`ws://${location.host}/ws`);
+  ws.binaryType = "arraybuffer";
+  ws.onclose = () => { ws = null; setTimeout(connect, 1000); };
+  ws.onmessage = e => {
+    if (typeof e.data === "string") return onState(JSON.parse(e.data));
+    const kind = new Uint8Array(e.data, 0, 1)[0];
+    if (kind === 1) drawFrame(e.data);
+    else if (kind === 3) drawPng(e.data.slice(1));
+  };
+}
+const act = (name, action, value) => wsSend({ t: "control", name, action, value }) || post("/control", { name, action, value });
+
+// ===================================================================== front
+const mpc = $("mpc");
+el(mpc, "", ...L.band).id = "band";
+el(mpc, "logo", 26, 24, null, null, "AKAI<small>professional</small>");
+el(mpc, "model", 335, 27, null, null, "MPC SAMPLE");
+el(mpc, "grille", ...L.grille);
+el(mpc, "rest", ...L.rest);
+const screen = document.createElement("canvas");
+screen.width = 320; screen.height = 240;
+screen.id = "screen"; screen.className = "abs off"; screen.setAttribute("aria-label", "MPC Sample screen");
+const sctx = screen.getContext("2d");
+Object.assign(screen.style, { left: L.screen[0] + "px", top: L.screen[1] + "px", width: L.screen[2] + "px", height: L.screen[3] + "px" });
+mpc.appendChild(screen);
+// shown while the MPC system is powered off; the emulator keeps running (QEMU -no-shutdown)
+const poweroff = el(mpc, "", L.screen[0], L.screen[1], L.screen[2], L.screen[3],
+  "MPC is off<br>POWER on the rear panel turns it on");
+poweroff.id = "poweroff";
+const meters = [];   // level meter LEDs beside the screen
+for (let c = 0; c < 2; c++) for (let r = 0; r < 5; r++) {
+  const m = el(mpc, "meter", L.meter.x + c * L.meter.dx, L.meter.y + r * L.meter.dy, L.meter.w, L.meter.h);
+  m.dataset.c = c; m.dataset.thr = [0.9, 0.5, 0.25, 0.1, 0.02][r]; m.dataset.col = ["#ff3b30", "#ff9500", "#39d353", "#39d353", "#39d353"][r];
+  meters.push(m);
+}
+el(mpc, "lbl light", L.vol[0], L.vol[1] + L.vol[2] + 6, null, null, "MAIN VOLUME");
+el(mpc, "logo", L.bank[0], L.bank[1], null, null, '<span id="bank" style="color:#e2e2e2;font-size:15px">A</span>');
+el(mpc, "led", L.bankLed[0], L.bankLed[1], 12, 5).id = "bankled";
+el(mpc, "section", 64, 171, null, null, "MODE");
+el(mpc, "section", 407, 171, null, null, "PAD PLAY");
+el(mpc, "lbl", 446, 296, null, null, '<svg width="7" height="10" viewBox="0 0 7 10"><rect x="2" y="0" width="3" height="6" rx="1.5" fill="#555"/><path d="M1 4.5a2.5 2.5 0 0 0 5 0M3.5 7v2" stroke="#555" fill="none" stroke-width=".8"/></svg>');
+
+el(mpc, "padgrid", ...L.padArea);
+for (const c of BUTTONS) {
+  const striped = c.cls.startsWith("stripe");
+  const d = el(mpc, "btn " + (striped ? "" : c.cls), c.x, c.y, c.w, c.h, c.label);
+  if (striped) {
+    const s = document.createElement("div");
+    s.className = "stripe" + (c.cls === "stripe-green" ? " green" : "");
+    if (c.cls === "stripe-white") s.style.background = "#ddd";
+    d.appendChild(s);
+  }
+  if (c.sub) el(mpc, "lbl", c.x + c.w / 2, c.y + c.h + 3.5, null, null, c.sub);
+  d.title = c.name; controls[c.name] = d;
+  bindButton(d, c.name);
+}
+for (let i = 0; i < 16; i++) {          // pads numbered from the bottom-left like the hardware
+  const col = i % 4, row = 3 - Math.floor(i / 4);
+  const x = L.pads.x + col * L.pads.step, y = L.pads.y + row * L.pads.step;
+  const p = el(mpc, "pad", x, y, L.pads.size, L.pads.size);
+  el(mpc, "padlbl", x + .5, y + L.pads.size + 1, null, null, `${i + 1}&nbsp;&nbsp;${PAD_SHIFT[i]}`);
+  p.title = "PAD " + (i + 1); controls["PAD " + (i + 1)] = p;
+  bindPad(p, "PAD " + (i + 1));
+}
+{ const [x, y, r] = L.vol; const d = el(mpc, "knob", x - r, y - r, 2 * r, 2 * r, '<div class="ind"></div>'); controls["MAIN VOLUME"] = d; bindKnob(d, "MAIN VOLUME"); }
+for (let k = 0; k < 3; k++) {
+  const x = L.knobs.x + k * L.knobs.dx, y = L.knobs.y, r = L.knobs.r;
+  el(mpc, "ring", x - r - 4, y - r - 4, 2 * r + 8, 2 * r + 8);
+  const d = el(mpc, "knob", x - r, y - r, 2 * r, 2 * r, '<div class="ind"></div>');
+  el(mpc, "lbl", x, y + r + 2.5, null, null, "K" + (k + 1));
+  controls["K" + (k + 1)] = d; bindKnob(d, "K" + (k + 1));
+}
+el(mpc, "fader-slot", L.fader.x - 3, L.fader.top, 6, L.fader.len);
+const cap = el(mpc, "fader-cap", L.fader.x - 15, L.fader.top + 50, 30, 28);
+controls["FADER"] = cap; bindFader(cap);
+el(mpc, "led", L.fader.x + 23, L.fader.top + 62, 9, 5).id = "faderled";
+{ const [x, y, r] = L.enc; const d = el(mpc, "enc", x - r, y - r, 2 * r, 2 * r); controls["DATA"] = d; bindEncoder(d); }
+
+// ===================================================================== rear
+const back = $("back");
+el(back, "logo", 14, 9, null, null, '<span style="font-size:13px">AKAI</span> <i style="font:italic 7px Georgia,serif;color:#c8302c">professional</i>');
+el(back, "model", 370, 10, null, null, '<span style="font-size:11px">MPC SAMPLE</span>');
+el(back, "base", null, null, null, null).style.left = "6px";
+el(back, "rlbl", 118, 28, null, null, "— MIDI —");
+el(back, "rlbl", 186, 28, null, null, "— AUDIO OUT —");
+el(back, "rlbl", 271, 28, null, null, "— AUDIO IN —");
+for (const j of REAR) {
+  el(back, "rlbl", j.x, j.label.includes("<br>") ? 30 : 35, null, null, j.label);
+  const d = el(back, "jack" + (j.r > 7 ? " big" : ""), j.x - j.r, 56 - j.r, 2 * j.r, 2 * j.r);
+  d.title = j.jack; d.dataset.kind = j.kind;
+  (jacks[j.jack] = jacks[j.jack] || []).push(d);
+  d.addEventListener("click", e => openMenu(j.jack, e));
+}
+for (const [jack, x, kind] of [["PHONES", 48, "out"], ["AUDIO OUT", 186, "out"], ["AUDIO IN", 271, "in"]]) {
+  for (let c = 0; c < 2; c++) { const v = el(back, "vu", x - 5 + c * 6, 70, 3, 9, "<i></i>"); v.dataset.kind = kind; v.dataset.c = c; }
+}
+el(back, "rlbl", 333, 35, null, null, "REC GAIN");
+const gain = el(back, "gain", 333 - 9, 56 - 9, 18, 18, '<div class="ind"></div>');
+el(back, "rlbl", 375, 35, null, null, "USB");
+const usb = el(back, "usb", 375 - 8, 56 - 3.5, 16, 7); usb.title = "USB-C: the stock gadget runs (USB network 192.168.155.1, USB MIDI); USB audio is not emulated. From the computer: ssh -p 2222 root@127.0.0.1 reaches 192.168.155.1:2222";
+el(back, "rlbl", 410, 35, null, null, "POWER");
+const power = el(back, "power", 410 - 9, 56 - 9, 18, 18);
+power.title = "POWER: the device's power key. The app asks \"Do you want to shut down?\", saves and powers off; the emulator keeps running and the next press powers the MPC on";
+power.addEventListener("click", () => post("/power", {}));
+el(back, "rlbl", 443, 35, null, null, "SD");
+const sd = el(back, "sd", 443 - 8, 56 - 2.5, 16, 5);
+sd.addEventListener("click", async () => {
+  const inserted = sd.classList.contains("in");
+  sd.title = inserted ? "Ejecting…" : "Copying the sdcard/ folder to a card…";
+  const r = await post("/sdcard", { action: inserted ? "eject" : "insert" });
+  if (r?.error) alert("SD: " + r.error);
+});
+function drawSd(c) {
+  if (!c) return;
+  sd.classList.toggle("in", c.inserted);
+  sd.title = (c.inserted ? "SD card inserted: a copy of " : "Slot empty. Click to insert a card made from ") + c.folder +
+    (c.inserted ? "\nClick to eject. A card inserted again is a fresh copy of the folder; what the app wrote on the old one is gone." : "") +
+    (c.error ? "\nError: " + c.error : "");
+}
+
+// ===================================================================== input bindings
+function bindButton(d, name) {
+  const down = () => { d.classList.add("down"); act(name, "press"); };
+  const up = () => { if (d.classList.contains("down")) { d.classList.remove("down"); act(name, "release"); } };
+  d.addEventListener("pointerdown", e => { e.preventDefault(); d.setPointerCapture(e.pointerId); down(); });
+  d.addEventListener("pointerup", up); d.addEventListener("pointercancel", up);
+  d._down = down; d._up = up;
+}
+function bindPad(d, name) {
+  const down = vel => { d.classList.add("down"); act(name, "press", vel); };
+  const up = () => { if (d.classList.contains("down")) { d.classList.remove("down"); act(name, "release", 0); } };
+  d.addEventListener("pointerdown", e => {   // velocity from where the pad is hit: top edge = hard
+    e.preventDefault(); d.setPointerCapture(e.pointerId);
+    const r = d.getBoundingClientRect();
+    down(Math.max(1, Math.min(127, Math.round(127 - 100 * (e.clientY - r.top) / r.height))));
+  });
+  d.addEventListener("pointerup", up); d.addEventListener("pointercancel", up);
+  d._down = () => down(110); d._up = up;
+}
+const pendingSet = {};
+let setFlush = 0;
+function setAbs(name, v) {
+  pos[name] = Math.max(0, Math.min(1, v));
+  const val = Math.round(pos[name] * 127);
+  if (val !== pendingSet[name]?.sent) {
+    pendingSet[name] = { ...pendingSet[name], val };
+    setFlush ||= requestAnimationFrame(() => {
+      setFlush = 0;
+      for (const [n, p] of Object.entries(pendingSet)) if (p.val !== p.sent) { act(n, "set", p.val); p.sent = p.val; }
+    });
+  }
+  draw(name);
+}
+function draw(name) {
+  const v = pos[name] ?? 0, d = controls[name];
+  if (name === "FADER") d.style.top = (L.fader.top + 2 + (1 - v) * (L.fader.len - 32)) + "px";
+  else d.querySelector(".ind").style.transform = `rotate(${-150 + v * 300}deg)`;
+}
+function dragValue(d, onDelta) {
+  d.addEventListener("pointerdown", e => {
+    e.preventDefault(); d.setPointerCapture(e.pointerId);
+    let last = e.clientY;
+    // a release outside the knob or a lost capture must also end the drag, or the knob keeps
+    // turning when the mouse merely passes over it later
+    const move = ev => { if (!ev.buttons) return stop(); onDelta(last - ev.clientY); last = ev.clientY; };
+    const stop = () => {
+      for (const t of ["pointermove", "pointerup", "pointercancel", "lostpointercapture"]) d.removeEventListener(t, t === "pointermove" ? move : stop);
+    };
+    d.addEventListener("pointermove", move);
+    for (const t of ["pointerup", "pointercancel", "lostpointercapture"]) d.addEventListener(t, stop);
+  });
+  d.addEventListener("wheel", e => { e.preventDefault(); onDelta(-Math.sign(e.deltaY) * 4); }, { passive: false });
+}
+function bindKnob(d, name) { pos[name] = 0.5; dragValue(d, dy => setAbs(name, pos[name] + dy / 150)); }
+function bindFader(d) { pos.FADER = 0.5; dragValue(d, dy => setAbs("FADER", pos.FADER + dy / (L.fader.len * scale))); }
+function bindEncoder(d) {
+  dragValue(d, dy => {
+    encAcc += dy;
+    while (Math.abs(encAcc) >= 8) { const s = Math.sign(encAcc); encAcc -= 8 * s; act("DATA", "turn", s > 0 ? 1 : 127); }
+  });
+  d.addEventListener("dblclick", () => { act("DATA", "press"); setTimeout(() => act("DATA", "release"), 80); });
+}
+let gainV = 50;
+dragValue(gain, dy => { gainV = Math.max(0, Math.min(100, gainV + dy / 2)); drawGain(); post("/recgain", { value: Math.round(gainV) }); });
+function drawGain() { gain.querySelector(".ind").style.transform = `rotate(${-150 + gainV * 3}deg)`; }
+
+// computer keyboard -> panel
+const KEYS = {
+  KeyZ: "PAD 1", KeyX: "PAD 2", KeyC: "PAD 3", KeyV: "PAD 4", KeyA: "PAD 5", KeyS: "PAD 6", KeyD: "PAD 7", KeyF: "PAD 8",
+  KeyQ: "PAD 9", KeyW: "PAD 10", KeyE: "PAD 11", KeyR: "PAD 12", Digit1: "PAD 13", Digit2: "PAD 14", Digit3: "PAD 15", Digit4: "PAD 16",
+  ShiftLeft: "SHIFT", ShiftRight: "SHIFT", Space: "PLAY", Escape: "STOP", Minus: "MINUS", Equal: "PLUS",
+  F1: "SCREEN 1", F2: "SCREEN 2", F3: "SCREEN 3", KeyB: "PAD BANK", KeyN: "NOTE REPEAT", Backspace: "ERASE",
+  KeyT: "TAP TEMPO", KeyO: "SAMPLE SELECT", KeyY: "SAMPLE", KeyU: "SEQ", KeyI: "PAD FX", KeyP: "KNOB FX",
+  KeyH: "CHOP", KeyJ: "MUTE", KeyK: "LOOP", KeyL: "16 LEVELS", Comma: "SAMPLE RECORD", Period: "SEQ RECORD",
+};
+const KNOB_KEYS = { Digit7: ["K1", 1], KeyM: ["K1", -1], Digit8: ["K2", 1], Slash: ["K2", -1], Digit9: ["K3", 1], Quote: ["K3", -1],
+  PageUp: ["FADER", 1], PageDown: ["FADER", -1], BracketRight: ["MAIN VOLUME", 1], BracketLeft: ["MAIN VOLUME", -1] };
+const typing = e => /INPUT|SELECT|TEXTAREA/.test(e.target.tagName) && e.target.type !== "range";
+addEventListener("keydown", e => {
+  if (e.metaKey || e.ctrlKey || e.altKey || typing(e)) return;
+  if (e.code === "ArrowLeft" || e.code === "ArrowRight") { e.preventDefault(); act("DATA", "turn", e.code === "ArrowRight" ? 1 : 127); return; }
+  if (e.code === "Enter") { e.preventDefault(); if (!e.repeat) act("DATA", "press"); return; }
+  if (KNOB_KEYS[e.code]) { e.preventDefault(); const [n, s] = KNOB_KEYS[e.code]; setAbs(n, (pos[n] ?? .5) + s * 0.04); return; }
+  const n = KEYS[e.code]; if (!n) return;
+  e.preventDefault(); if (!e.repeat) controls[n]._down();
+});
+addEventListener("keyup", e => {
+  if (typing(e)) return;
+  if (e.code === "Enter") { act("DATA", "release"); return; }
+  const n = KEYS[e.code]; if (n) controls[n]._up();
+});
+$("help").innerHTML = [["Z X C V · A S D F · Q W E R · 1 2 3 4", "pads 1–16"], ["Shift", "SHIFT"], ["Space / Esc", "PLAY / STOP"],
+  ["← → / Enter", "encoder turn / push"], ["F1 F2 F3", "buttons above the screen"], ["7 M · 8 / · 9 '", "K1 · K2 · K3"],
+  ["PgUp PgDn · [ ]", "fader · main volume"], ["- =", "− / +"], ["Y U I P", "SAMPLE SEQ PAD-FX KNOB-FX"], ["H J K L", "CHOP MUTE LOOP 16-LEVELS"],
+  ["B N ⌫ T O", "BANK REPEAT ERASE TAP SELECT"], [", .", "SAMPLE REC / SEQ REC"]].map(([k, v]) => `<code>${k}</code> ${v}`).join("<br>") +
+  "<br>Mouse: click buttons and pads (higher on a pad = harder), drag or scroll knobs, fader, encoder and REC GAIN; double-click the encoder to push. Click a rear jack to patch it.";
+
+// ===================================================================== rear patching
+const menu = $("menu");
+function openMenu(jack, e) {
+  e.stopPropagation();
+  const cur = STATE?.rear?.patch?.[jack] ?? "none";
+  const opts = STATE?.rear?.jacks?.[jack] ?? ["none"];
+  menu.innerHTML = `<div class="hdr">${jack}</div>` + opts.map(t => `<div data-t="${t}" class="${t === cur ? "cur" : ""}">${TARGETS[t] ?? t}</div>`).join("");
+  menu.style.display = "block";
+  menu.style.left = Math.min(e.clientX, innerWidth - 190) + "px"; menu.style.top = Math.min(e.clientY + 6, innerHeight - 200) + "px";
+  menu.onclick = async ev => {
+    const t = ev.target.dataset.t; if (!t) return;
+    menu.style.display = "none";
+    const r = await post("/route", { jack, target: t });
+    if (r && STATE) { STATE.rear = r; drawPatch(); }
+  };
+}
+addEventListener("click", () => menu.style.display = "none");
+
+const svg = $("cables");
+function center(elm) { const r = elm.getBoundingClientRect(); return [r.left + r.width / 2 + scrollX, r.top + r.height / 2 + scrollY]; }
+function drawPatch() {
+  const patch = STATE?.rear?.patch; if (!patch) return;
+  let paths = "";
+  for (const [jack, els] of Object.entries(jacks)) {
+    const t = patch[jack], kind = els[0].dataset.kind, col = KIND_COLOUR[kind];
+    for (const j of els) { j.classList.toggle("plugged", t !== "none"); j.style.setProperty("--plug", col); }
+    if (t === "none") continue;
+    const [x1, y1] = center(els[els.length - 1]);
+    if (t === "loop") {
+      if (!jack.endsWith("OUT")) continue;            // draw each loop cable once, OUT -> IN
+      const [x2, y2] = center(jacks[jack.replace("OUT", "IN")][0]);
+      const lift = 30 + Math.abs(x2 - x1) * .25;   // loop cable arcs above the rear panel
+      paths += `<path d="M${x1} ${y1} C${x1} ${y1 - lift} ${x2} ${y2 - lift} ${x2} ${y2}" stroke="${col}" />`;
+    } else if (TARGET_CARD[t] && !document.body.classList.contains("norack")) {
+      const port = $(TARGET_CARD[t]).querySelector(".port");
+      const [x2, y2] = center(port);
+      paths += `<path d="M${x1} ${y1} C${x1} ${Math.min(y1, y2) - 60} ${x2 - 140} ${y2} ${x2} ${y2}" stroke="${col}" />`;
+    }
+  }
+  svg.setAttribute("width", document.documentElement.scrollWidth); svg.setAttribute("height", document.documentElement.scrollHeight);
+  svg.innerHTML = `<g fill="none" stroke-width="3.5" stroke-linecap="round" opacity=".85">${paths}</g>`;
+  for (const [t, id] of Object.entries(TARGET_CARD))
+    $(id).querySelector(".port").classList.toggle("on", Object.values(patch).includes(t));
+}
+
+// ===================================================================== MIDI keyboard + monitor (rear MIDI jacks)
+const kch = $("kch");
+for (let c = 1; c <= 16; c++) kch.add(new Option(c, c));
+const midi = hex => wsSend({ t: "midi", hex }) || post("/midi", { hex });
+const h2 = n => n.toString(16).padStart(2, "0");
+const ch = () => +kch.value - 1;
+$("kvel").oninput = e => $("kvelv").textContent = e.target.value;
+$("ccv").oninput = e => { $("ccvv").textContent = e.target.value; midi(`${h2(0xB0 | ch())} ${h2(+$("ccn").value & 127)} ${h2(+e.target.value)}`); };
+$("mStart").onclick = () => midi("FA"); $("mStop").onclick = () => midi("FC");
+$("mPanic").onclick = () => midi(`${h2(0xB0 | ch())} 7B 00`);
+let clockTimer = null;
+$("mClock").onclick = e => {   // 24 ticks per beat at 120 BPM
+  if (clockTimer) { clearInterval(clockTimer); clockTimer = null; e.target.classList.remove("on"); return; }
+  clockTimer = setInterval(() => midi("F8"), 1000 / 48); e.target.classList.add("on");
+};
+{ // two octaves from C3 (MIDI 48)
+  const keys = $("keys"), whiteW = 100 / 15; let wi = 0;
+  for (let n = 48; n < 72; n++) {
+    const black = [1, 3, 6, 8, 10].includes(n % 12);
+    const k = document.createElement("div");
+    k.className = black ? "b" : "w";
+    k.style.left = (black ? wi * whiteW - whiteW * .3 : wi * whiteW) + "%";
+    k.style.width = (black ? whiteW * .6 : whiteW) + "%";
+    if (!black) wi++;
+    const on = ev => { ev.preventDefault(); k.setPointerCapture(ev.pointerId); k.classList.add("down"); midi(`${h2(0x90 | ch())} ${h2(n)} ${h2(+$("kvel").value)}`); };
+    const off = () => { if (!k.classList.contains("down")) return; k.classList.remove("down"); midi(`${h2(0x80 | ch())} ${h2(n)} 00`); };
+    k.addEventListener("pointerdown", on); k.addEventListener("pointerup", off); k.addEventListener("pointercancel", off);
+    keys.appendChild(k);
+  }
+}
+$("midiClear").onclick = () => $("midilog").innerHTML = "";
+function appendMidi(log) {
+  const box = $("midilog"), atEnd = box.scrollTop + box.clientHeight >= box.scrollHeight - 4;
+  for (const [seq, t, dir, hex, text] of log) {
+    midiSeen = Math.max(midiSeen, seq);
+    const d = document.createElement("div"); d.className = dir;
+    d.textContent = `${new Date(t * 1000).toTimeString().slice(0, 8)} ${dir === "out" ? "OUT ▶" : "IN  ◀"} ${hex.padEnd(9)} ${text}`;
+    box.appendChild(d);
+  }
+  while (box.childElementCount > 300) box.firstChild.remove();
+  if (atEnd) box.scrollTop = box.scrollHeight;
+}
+
+// ===================================================================== feedback from the app
+const bar = (id, v) => { const e = $(id); if (e) e.style.width = Math.min(100, Math.round((v || 0) * 100)) + "%"; };
+function applyState(s) {
+  STATE = s;
+  $("status").innerHTML = (s.connected ? '<span class="ok">● panel UART</span>' : '<span class="bad">● VM not running (make run)</span>') +
+    " &nbsp; " + (s.midi?.connected ? '<span class="ok">● MIDI UART</span>' : '<span class="bad">● MIDI UART</span>') +
+    " &nbsp; " + (s.rear?.levels?.age != null && s.rear.levels.age < 2 ? '<span class="ok">● audio bridge</span>' : '<span class="warn">● audio bridge idle</span>') +
+    (audioStat ? ` &nbsp; <span class="${audioStat.under ? "warn" : "ok"}">● sound: buffer ${(audioStat.target / 44.1).toFixed(0)} ms, underruns ${audioStat.under}</span>` : "");
+  for (const [name, d] of Object.entries(controls)) {
+    const c = MAP.controls[name];
+    d.classList.toggle("unmapped", !(c && (c.press || c.set || c.turn)));
+    if (!c || c.led == null) continue;
+    const v = s.leds[c.led] || 0, stripe = d.querySelector(".stripe");
+    if (stripe) stripe.classList.toggle("lit", v > 0);
+    else { d.classList.toggle("lit", v >= 2); d.classList.toggle("dim", v === 1); }
+  }
+  for (let i = 0; i < 16; i++) {
+    const rgb = s.pads[i], d = controls["PAD " + (i + 1)];
+    if (!rgb || (rgb[0] | rgb[1] | rgb[2]) === 0) { d.style.background = ""; d.style.setProperty("--glow", "transparent"); continue; }
+    const css = `rgb(${rgb.map(v => Math.min(255, v * 2 + 1)).join(",")})`;   // MCU: 7-bit -> 8-bit as v*2+1
+    d.style.background = css; d.style.setProperty("--glow", css);
+  }
+  const lit = Object.entries(MAP.bank_leds || {}).find(([cc]) => (s.leds[cc] || 0) > 0);
+  $("bank").textContent = lit ? lit[1] : "";
+  $("bankled").classList.toggle("on", !!lit);
+  // audio levels from the bridge
+  const lv = s.rear?.levels || {}, out = lv.age != null && lv.age < 2 ? (lv.out || []) : [], inn = lv.age != null && lv.age < 2 ? (lv.in || []) : [];
+  const routing = s.rear?.routing || {};
+  bar("lvIn", Math.max(inn[0] || 0, inn[1] || 0)); bar("lvC1", Math.max(out[0] || 0, out[1] || 0)); bar("lvC3", Math.max(out[2] || 0, out[3] || 0));
+  const pr = routing.pair === 2 ? [out[2], out[3]] : [out[0], out[1]];
+  bar("lvOutL", routing.out === "on" ? pr[0] : 0); bar("lvOutR", routing.out === "on" ? pr[1] : 0);
+  $("macNote").innerHTML = routing.out !== "on" ? "Muted: a cable is in PHONES/AUDIO OUT but none goes to the Mac." :
+    (routing.pair === 2 ? "PHONES (ch 3–4)" : "Main out (ch 1–2)") + " plays in this page.";
+  for (const m of meters) { const v = out[+m.dataset.c] || 0; m.style.background = v >= +m.dataset.thr ? m.dataset.col : ""; }
+  for (const v of back.querySelectorAll(".vu")) {
+    const arr = v.dataset.kind === "in" ? inn : out; v.firstChild.style.height = Math.min(100, (arr[+v.dataset.c] || 0) * 100) + "%";
+  }
+  if (s.rear?.rec_gain != null && !gain.matches(":active")) { gainV = s.rear.rec_gain; drawGain(); }
+  if (s.midi) {
+    appendMidi(s.midi.log);
+    $("midiStat").textContent = `out ${s.midi.counts.out} · in ${s.midi.counts.in}` + (s.midi.bpm ? ` · clock ${s.midi.bpm} BPM` : "") + (s.midi.loop ? " · loop cable" : "");
+  }
+  drawPatch();
+}
+let potsSynced = false, lastState = 0;
+function onState(s) {
+  lastState = performance.now();
+  if (s.pcm_port) pcmPort = s.pcm_port;
+  if (!potsSynced && s.pots) {   // start the drawn pots where the emulated MCU reports them
+    for (const [name, c] of Object.entries(MAP.controls)) if (c.set && s.pots[c.id] !== undefined) { pos[name] = s.pots[c.id] / 127; draw(name); }
+    potsSynced = true;
+  }
+  applyState(s);
+  drawSd(s.sdcard);
+  poweroff.classList.toggle("on", s.power === "off");
+  syncMic(s.rear?.patch?.["AUDIO IN"] === "input");
+}
+async function pollState() {   // fallback while the WebSocket is down
+  if (performance.now() - lastState > 1000) {
+    try { onState(await (await fetch("/state?since=" + midiSeen)).json()); } catch {}
+  }
+  setTimeout(pollState, 150);
+}
+function drawFrame(buf) {
+  const dv = new DataView(buf), w = dv.getUint16(1, true), h = dv.getUint16(3, true);
+  const px = new Uint8ClampedArray(buf.slice(5));
+  for (let i = 3; i < px.length; i += 4) px[i] = 255;   // VNC's padding byte -> opaque
+  if (screen.width !== w || screen.height !== h) { screen.width = w; screen.height = h; }
+  sctx.putImageData(new ImageData(px, w, h), 0, 0);
+  screen.classList.remove("off");
+  lastFrame = performance.now();
+}
+async function drawPng(buf) {   // screendump right after an input (see Burst in server.py)
+  const bmp = await createImageBitmap(new Blob([buf], { type: "image/png" }));
+  if (screen.width !== bmp.width || screen.height !== bmp.height) { screen.width = bmp.width; screen.height = bmp.height; }
+  sctx.drawImage(bmp, 0, 0);
+  screen.classList.remove("off");
+  lastFrame = performance.now();
+}
+async function pollScreen() {   // fallback (no VNC frames): screendumps over HTTP
+  // shown at 1:1 or larger the firmware's pixel font stays sharp; below that, smooth it
+  screen.style.imageRendering = L.screen[2] * scale >= 320 ? "pixelated" : "auto";
+  if (performance.now() - lastFrame > 2000) {
+    try {
+      const r = await fetch("/screen.png?" + Date.now());
+      if (r.ok) { sctx.drawImage(await createImageBitmap(await r.blob()), 0, 0); screen.classList.remove("off"); }
+      else screen.classList.add("off");
+    } catch { screen.classList.add("off"); }
+  }
+  setTimeout(pollScreen, 66);
+}
+
+// ===================================================================== sound
+// The bridge in the VM streams the app's output as S16 stereo 44.1 kHz; a worklet plays it from
+// a ring buffer. Guest and sound-card clocks drift, so the worklet resamples by up to 0.3% to
+// hold the buffer near its target (320 frames = 7 ms), raises the target by 128 frames after an
+// underrun and lowers it again after 10 s without one. Measured pad-to-page arrival ~18 ms; the
+// context asks for the smallest output latency (Chrome on macOS: 2.9 + 8 ms instead of 5.8 + 16).
+const WORKLETS = `
+class Player extends AudioWorkletProcessor {
+  constructor() {
+    super();
+    this.size = 65536; this.buf = new Float32Array(this.size * 2);
+    this.w = 0; this.r = 0; this.frac = 0; this.target = 320; this.ema = 320;
+    this.primed = false; this.under = 0; this.calm = 0; this.t = 0;
+    const push = data => {
+      const s = new Int16Array(data), n = s.length >> 1;
+      for (let i = 0; i < n; i++, this.w++) {
+        const k = (this.w % this.size) * 2;
+        this.buf[k] = s[2 * i] / 32768; this.buf[k + 1] = s[2 * i + 1] / 32768;
+      }
+      if (this.w - this.r > this.size / 2) { this.r = this.w - this.target; this.frac = 0; }
+    };
+    // PCM arrives straight from the audio worker on its own port (see AUDIO_WORKER)
+    this.port.onmessage = e => { if (e.data && e.data.port) e.data.port.onmessage = m => push(m.data); };
+  }
+  process(_, outputs) {
+    const L = outputs[0][0], R = outputs[0][1] || L, n = L.length;
+    const fill = this.w - this.r;
+    if (++this.t % 344 === 0) this.port.postMessage({ fill, target: this.target, under: this.under });
+    if (!this.primed) {
+      if (fill < this.target) { L.fill(0); R.fill(0); return true; }
+      this.primed = true; this.ema = fill;
+    }
+    if (fill > 4 * this.target) { this.r = this.w - this.target; this.ema = this.target; }
+    this.ema += 0.01 * (fill - this.ema);
+    const ratio = 1 + Math.max(-0.003, Math.min(0.003, 0.003 * (this.ema - this.target) / this.target));
+    if (++this.calm > 344 * 10 && this.target > 320) { this.target = Math.max(320, this.target - 32); this.calm = 0; }
+    for (let i = 0; i < n; i++) {
+      if (this.w - this.r < 2) {                 // underrun: silence, then rebuffer to a larger target
+        L.fill(0, i); R.fill(0, i);
+        this.primed = false; this.under++; this.calm = 0;
+        this.target = Math.min(1536, this.target + 128);
+        break;
+      }
+      const a = (this.r % this.size) * 2, b = ((this.r + 1) % this.size) * 2, t = this.frac;
+      L[i] = this.buf[a] + (this.buf[b] - this.buf[a]) * t;
+      R[i] = this.buf[a + 1] + (this.buf[b + 1] - this.buf[a + 1]) * t;
+      this.frac += ratio;
+      const step = Math.floor(this.frac);
+      this.r += step; this.frac -= step;
+    }
+    return true;
+  }
+}
+class Recorder extends AudioWorkletProcessor {
+  constructor() { super(); this.out = new Int16Array(512 * 2); this.n = 0; }
+  process(inputs) {
+    const inp = inputs[0];
+    if (!inp.length) return true;
+    const L = inp[0], R = inp[1] || inp[0];
+    for (let i = 0; i < L.length; i++) {
+      this.out[this.n * 2] = Math.max(-1, Math.min(1, L[i])) * 32767;
+      this.out[this.n * 2 + 1] = Math.max(-1, Math.min(1, R[i])) * 32767;
+      if (++this.n === 512) { this.port.postMessage(this.out.slice().buffer); this.n = 0; }
+    }
+    return true;
+  }
+}
+registerProcessor("mpclab-player", Player);
+registerProcessor("mpclab-recorder", Recorder);
+`;
+// The sound has its own WebSocket in a worker, straight to QEMU's chardev for the bridge's
+// PCM port: neither the page's main thread (it draws ~30 screen frames a second) nor the
+// Python panel server sits in the path. The worker hands each chunk to the worklet over a
+// MessagePort, and sends the microphone back the same way.
+const AUDIO_WORKER = `
+let out = null, ws = null, rest = new Uint8Array(0);
+function connect(url) {
+  ws = new WebSocket(url);   // QEMU's chardev for the bridge's "mpclab.pcm" port
+  ws.binaryType = "arraybuffer";
+  ws.onmessage = m => {
+    if (!out || typeof m.data === "string") return;
+    let b = new Uint8Array(m.data);
+    if (rest.length) { const j = new Uint8Array(rest.length + b.length); j.set(rest); j.set(b, rest.length); b = j; }
+    const n = b.length - b.length % 4;                       // whole stereo S16 frames
+    rest = b.slice(n);
+    if (n) { const c = b.slice(0, n).buffer; out.postMessage(c, [c]); }
+  };
+  ws.onclose = () => { ws = null; setTimeout(() => connect(url), 1000); };
+}
+onmessage = e => {
+  if (e.data instanceof ArrayBuffer) { if (ws && ws.readyState === 1) ws.send(e.data); return; }   // microphone
+  out = e.data.port; connect(e.data.url);
+};
+`;
+let actx = null, player = null, audioStat = null, mic = null, micWanted = false, audioWorker = null, pcmPort = 5557;
+async function startAudio() {
+  if (actx) { if (actx.state !== "running") actx.resume(); return; }
+  actx = new AudioContext({ sampleRate: 44100, latencyHint: 0 });
+  await actx.audioWorklet.addModule(URL.createObjectURL(new Blob([WORKLETS], { type: "text/javascript" })));
+  player = new AudioWorkletNode(actx, "mpclab-player", { numberOfInputs: 0, outputChannelCount: [2] });
+  player.port.onmessage = e => { audioStat = e.data; };
+  player.connect(actx.destination);
+  const ch = new MessageChannel();
+  player.port.postMessage({ port: ch.port1 }, [ch.port1]);
+  audioWorker = new Worker(URL.createObjectURL(new Blob([AUDIO_WORKER], { type: "text/javascript" })));
+  audioWorker.postMessage({ port: ch.port2, url: `ws://${location.hostname}:${pcmPort}` }, [ch.port2]);
+  actx.onstatechange = showSound;
+  showSound();
+  syncMic(micWanted);
+}
+function showSound() { $("soundBadge").style.display = actx && actx.state === "running" ? "none" : ""; }
+async function syncMic(want) {   // AUDIO IN patched to "input": the computer's microphone
+  micWanted = want;
+  if (!actx || want === !!mic) return;
+  if (!want) { if (mic.stream) { mic.stream.getTracks().forEach(t => t.stop()); mic.node.disconnect(); } mic = null; return; }
+  mic = { pending: true };
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false } });
+    if (!micWanted) { stream.getTracks().forEach(t => t.stop()); mic = null; return; }   // unpatched meanwhile
+    const node = new AudioWorkletNode(actx, "mpclab-recorder");
+    node.port.onmessage = e => audioWorker && audioWorker.postMessage(e.data, [e.data]);
+    actx.createMediaStreamSource(stream).connect(node);
+    mic = { stream, node };
+  } catch (e) { mic = null; alert("No microphone access: " + e.message); }
+}
+for (const ev of ["pointerdown", "keydown"]) addEventListener(ev, startAudio, { capture: true });
+$("soundBadge").onclick = startAudio;
+
+// ===================================================================== SD autorun packages
+async function arPoll() {
+  try {
+    const j = await (await fetch("/autorun")).json();
+    $("arOut").textContent = j.log.join("\n");
+    $("arRun").disabled = j.running;
+    if (j.running) setTimeout(arPoll, 1000);
+  } catch { setTimeout(arPoll, 2000); }
+}
+$("arRun").onclick = async () => {
+  const f = $("arZip").files[0];
+  if (!f) { $("arOut").textContent = "Choose a zip first."; return; }
+  $("arRun").disabled = true;
+  $("arOut").textContent = "Sending " + f.name + "…";
+  const q = `reboot=${$("arReboot").checked ? 1 : 0}&confirm=${$("arYes").checked ? 1 : 0}`;
+  const r = await fetch("/autorun?" + q, { method: "POST", body: f });
+  const j = await r.json();
+  if (!r.ok) { $("arOut").textContent = "Error: " + j.error; $("arRun").disabled = false; return; }
+  arPoll();
+};
+$("arResults").onclick = async () => {
+  $("arOut").textContent = "Reading results from the VM…";
+  const j = await (await fetch("/autorun/results", { method: "POST" })).json();
+  $("arOut").textContent = j.text || ("Error: " + j.error);
+};
+
+// ===================================================================== sizing
+// the side panel can be hidden so the device gets the whole width (screen at 1:1 or larger)
+try { if (localStorage.getItem("mpclab.norack") === "1") document.body.classList.add("norack"); } catch {}
+$("rackToggle").onclick = () => {
+  const hidden = document.body.classList.toggle("norack");
+  $("rackToggle").textContent = hidden ? "⟨" : "⟩";
+  try { localStorage.setItem("mpclab.norack", hidden ? "1" : "0"); } catch {}
+  fit();
+};
+$("rackToggle").textContent = document.body.classList.contains("norack") ? "⟨" : "⟩";
+function fit() {
+  const avail = $("stage").clientWidth - 16;
+  // the device fills the width up to 1200 px and the page scrolls: the larger the window, the
+  // larger the screen
+  const fs = Math.min(1200 / 465, Math.max(0.8, avail / 465));
+  for (const [wrap, unit, w, h] of [["frontWrap", mpc, 465, 558], ["backWrap", back, 465, 96]]) {
+    unit.style.transform = `scale(${fs})`;
+    Object.assign($(wrap).style, { width: w * fs + "px", height: h * fs + "px" });
+  }
+  scale = fs;
+  drawPatch();
+}
+addEventListener("resize", fit);
+addEventListener("scroll", drawPatch);
+$("rack").addEventListener("scroll", drawPatch);
+fetch("/controls.json").then(r => r.json()).then(m => { MAP = m; ["MAIN VOLUME", "K1", "K2", "K3", "FADER"].forEach(draw); drawGain(); fit(); connect(); pollState(); });
+pollScreen();
+</script>
+</body>
+</html>

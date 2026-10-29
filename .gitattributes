@@ -1,0 +1,8 @@
+# Shell scripts run inside the Linux build container: keep LF even on Windows checkouts.
+*.sh text eol=lf
+Makefile text eol=lf
+Dockerfile text eol=lf
+*.py text eol=lf
+*.patch text eol=lf
+initramfs/init text eol=lf
+overlay/** text eol=lf

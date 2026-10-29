@@ -1,0 +1,35 @@
+usb: gadget: f_uac2: accept the "shared_clock" attribute of the MPC Sample gadget scheme (lab only).
+
+The stock gadget scheme (/usr/lib/az0x-usb-gadget/ac50.scheme) sets uac2 shared_clock = 1, an
+attribute of inMusic's vendor kernel. Mainline has no such file, so libusbgx failed with
+"Access denied" and the whole gadget (USB audio, USB network 192.168.155.1, USB MIDI) stayed
+down. Here the attribute is stored and has no effect: no USB host streams audio in the lab.
+
+--- a/drivers/usb/gadget/function/u_uac2.h	2026-10-27 16:44:13.552970132 +0000
++++ b/drivers/usb/gadget/function/u_uac2.h	2026-10-27 16:44:13.596837090 +0000
+@@ -66,6 +66,7 @@
+ 
+ 	int				req_number;
+ 	int				fb_max;
++	bool				shared_clock;	/* inMusic scheme attribute; no effect here */
+ 	bool			bound;
+ 
+ 	char			function_name[USB_MAX_STRING_LEN];
+--- a/drivers/usb/gadget/function/f_uac2.c	2026-10-27 16:44:13.553470007 +0000
++++ b/drivers/usb/gadget/function/f_uac2.c	2026-10-27 16:44:13.597188632 +0000
+@@ -2106,6 +2106,7 @@
+ UAC2_ATTRIBUTE(s16, c_volume_max);
+ UAC2_ATTRIBUTE(s16, c_volume_res);
+ UAC2_ATTRIBUTE(u32, fb_max);
++UAC2_ATTRIBUTE(bool, shared_clock);
+ UAC2_ATTRIBUTE_STRING(function_name);
+ UAC2_ATTRIBUTE_STRING(if_ctrl_name);
+ UAC2_ATTRIBUTE_STRING(clksrc_in_name);
+@@ -2137,6 +2138,7 @@
+ 	&f_uac2_opts_attr_c_sync,
+ 	&f_uac2_opts_attr_req_number,
+ 	&f_uac2_opts_attr_fb_max,
++	&f_uac2_opts_attr_shared_clock,
+ 
+ 	&f_uac2_opts_attr_p_mute_present,
+ 	&f_uac2_opts_attr_p_volume_present,

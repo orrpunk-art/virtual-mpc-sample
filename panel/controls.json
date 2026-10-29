@@ -1,0 +1,259 @@
+{
+ "_source": "community-documented MPC Sample control-surface protocol, verified on hardware 2026-10-22",
+ "_comment": "MCU -> app input frames. {id}/{value} are substituted. led = CC number the app drives (B0 led state): single 0/1/>=2, bicolour 3*A+B.",
+ "bank_leds": {
+  "57": "A",
+  "58": "B",
+  "59": "C",
+  "60": "D",
+  "61": "E",
+  "62": "F",
+  "63": "G",
+  "64": "H"
+ },
+ "controls": {
+  "SAMPLE": {
+   "id": 6,
+   "press": "90 {id} 7F",
+   "release": "80 {id} 00",
+   "led": 6
+  },
+  "SEQ": {
+   "id": 7,
+   "press": "90 {id} 7F",
+   "release": "80 {id} 00",
+   "led": 7
+  },
+  "PAD FX": {
+   "id": 1,
+   "press": "90 {id} 7F",
+   "release": "80 {id} 00",
+   "led": 1
+  },
+  "KNOB FX": {
+   "id": 0,
+   "press": "90 {id} 7F",
+   "release": "80 {id} 00",
+   "led": 0
+  },
+  "SHIFT": {
+   "id": 49,
+   "press": "90 {id} 7F",
+   "release": "80 {id} 00",
+   "led": 49
+  },
+  "PAD BANK": {
+   "id": 35,
+   "press": "90 {id} 7F",
+   "release": "80 {id} 00",
+   "led": 35
+  },
+  "ERASE": {
+   "id": 9,
+   "press": "90 {id} 7F",
+   "release": "80 {id} 00",
+   "led": 9
+  },
+  "NOTE REPEAT": {
+   "id": 11,
+   "press": "90 {id} 7F",
+   "release": "80 {id} 00",
+   "led": 11
+  },
+  "SCREEN 1": {
+   "id": 12,
+   "press": "90 {id} 7F",
+   "release": "80 {id} 00"
+  },
+  "SCREEN 2": {
+   "id": 13,
+   "press": "90 {id} 7F",
+   "release": "80 {id} 00"
+  },
+  "SCREEN 3": {
+   "id": 14,
+   "press": "90 {id} 7F",
+   "release": "80 {id} 00"
+  },
+  "CHOP": {
+   "id": 75,
+   "press": "90 {id} 7F",
+   "release": "80 {id} 00",
+   "led": 75
+  },
+  "MUTE": {
+   "id": 43,
+   "press": "90 {id} 7F",
+   "release": "80 {id} 00",
+   "led": 43
+  },
+  "LOOP": {
+   "id": 74,
+   "press": "90 {id} 7F",
+   "release": "80 {id} 00",
+   "led": 74
+  },
+  "16 LEVELS": {
+   "id": 40,
+   "press": "90 {id} 7F",
+   "release": "80 {id} 00",
+   "led": 40
+  },
+  "SAMPLE SELECT": {
+   "id": 36,
+   "press": "90 {id} 7F",
+   "release": "80 {id} 00",
+   "led": 36
+  },
+  "TAP TEMPO": {
+   "id": 53,
+   "press": "90 {id} 7F",
+   "release": "80 {id} 00",
+   "led": 53
+  },
+  "MINUS": {
+   "id": 55,
+   "press": "90 {id} 7F",
+   "release": "80 {id} 00",
+   "led": 55
+  },
+  "PLUS": {
+   "id": 54,
+   "press": "90 {id} 7F",
+   "release": "80 {id} 00",
+   "led": 54
+  },
+  "SAMPLE RECORD": {
+   "id": 73,
+   "press": "90 {id} 7F",
+   "release": "80 {id} 00",
+   "led": 73
+  },
+  "SEQ RECORD": {
+   "id": 80,
+   "press": "90 {id} 7F",
+   "release": "80 {id} 00",
+   "led": 80
+  },
+  "STOP": {
+   "id": 81,
+   "press": "90 {id} 7F",
+   "release": "80 {id} 00",
+   "led": 81
+  },
+  "PLAY": {
+   "id": 82,
+   "press": "90 {id} 7F",
+   "release": "80 {id} 00",
+   "led": 82
+  },
+  "DATA": {
+   "id": 100,
+   "push": 111,
+   "turn": "B0 {id} {value}",
+   "press": "90 6F 7F",
+   "release": "80 6F 00",
+   "_note": "relative: 01 = +1, 7F = -1 (direction not verified on hardware)"
+  },
+  "PAD 1": {
+   "id": 37,
+   "press": "99 {id} {value}",
+   "release": "89 {id} 00"
+  },
+  "PAD 2": {
+   "id": 36,
+   "press": "99 {id} {value}",
+   "release": "89 {id} 00"
+  },
+  "PAD 3": {
+   "id": 42,
+   "press": "99 {id} {value}",
+   "release": "89 {id} 00"
+  },
+  "PAD 4": {
+   "id": 82,
+   "press": "99 {id} {value}",
+   "release": "89 {id} 00"
+  },
+  "PAD 5": {
+   "id": 40,
+   "press": "99 {id} {value}",
+   "release": "89 {id} 00"
+  },
+  "PAD 6": {
+   "id": 38,
+   "press": "99 {id} {value}",
+   "release": "89 {id} 00"
+  },
+  "PAD 7": {
+   "id": 46,
+   "press": "99 {id} {value}",
+   "release": "89 {id} 00"
+  },
+  "PAD 8": {
+   "id": 44,
+   "press": "99 {id} {value}",
+   "release": "89 {id} 00"
+  },
+  "PAD 9": {
+   "id": 48,
+   "press": "99 {id} {value}",
+   "release": "89 {id} 00"
+  },
+  "PAD 10": {
+   "id": 47,
+   "press": "99 {id} {value}",
+   "release": "89 {id} 00"
+  },
+  "PAD 11": {
+   "id": 45,
+   "press": "99 {id} {value}",
+   "release": "89 {id} 00"
+  },
+  "PAD 12": {
+   "id": 43,
+   "press": "99 {id} {value}",
+   "release": "89 {id} 00"
+  },
+  "PAD 13": {
+   "id": 49,
+   "press": "99 {id} {value}",
+   "release": "89 {id} 00"
+  },
+  "PAD 14": {
+   "id": 55,
+   "press": "99 {id} {value}",
+   "release": "89 {id} 00"
+  },
+  "PAD 15": {
+   "id": 51,
+   "press": "99 {id} {value}",
+   "release": "89 {id} 00"
+  },
+  "PAD 16": {
+   "id": 53,
+   "press": "99 {id} {value}",
+   "release": "89 {id} 00"
+  },
+  "K1": {
+   "id": 16,
+   "set": "B0 {id} {value}"
+  },
+  "K2": {
+   "id": 17,
+   "set": "B0 {id} {value}"
+  },
+  "K3": {
+   "id": 18,
+   "set": "B0 {id} {value}"
+  },
+  "MAIN VOLUME": {
+   "id": 19,
+   "set": "B0 {id} {value}"
+  },
+  "FADER": {
+   "id": 20,
+   "set": "B0 {id} {value}"
+  }
+ }
+}

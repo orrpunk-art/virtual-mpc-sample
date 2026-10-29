@@ -1,0 +1,67 @@
+/* The panel's buttons as an index, then one card per button or SHIFT combo: the screen it
+   opens, what it does (from the Akai guide), its SCREEN/K labels, the steps tried inside. */
+:root {
+  --bg: #f3f2ef; --panel: #ffffff; --ink: #1d1c1a; --muted: #6b6760; --line: #dcd8d0;
+  --accent: #c8661a; --teal: #1f8f84; --chip: #ecebe7; --does: #fbf3ea;
+  --display: "Barlow Condensed", "Arial Narrow", sans-serif;
+  --body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) { :root {
+  --bg: #141412; --panel: #1d1c1a; --ink: #ecebe6; --muted: #a29d94; --line: #34322e;
+  --accent: #f0913d; --teal: #3fb8ab; --chip: #2a2926; --does: #2a2219; color-scheme: dark } }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.5 var(--body); }
+.top { position: sticky; top: 0; z-index: 5; background: var(--bg); border-bottom: 1px solid var(--line); }
+.bar, main { max-width: 1180px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.bar { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center; justify-content: space-between; padding-block: 10px; }
+h1 { font: 700 30px/1 var(--display); margin: 0; letter-spacing: .01em; }
+h1 em { color: var(--accent); font-style: normal; }
+.tools { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+#find { font: inherit; padding: 6px 10px; border: 1px solid var(--line); border-radius: 6px; background: var(--panel); color: var(--ink); min-width: 0; width: 220px; max-width: 100%; }
+.lang { display: inline-flex; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+.lang button { font: 500 13px var(--mono); padding: 6px 12px; border: 0; background: var(--panel); color: var(--muted); cursor: pointer; }
+.lang button[aria-pressed="true"] { background: var(--accent); color: #fff; }
+button:focus-visible, a:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+main { display: flex; flex-direction: column; gap: 24px; padding-block: 20px 64px; }
+.lede { color: var(--muted); max-width: 75ch; margin: 0; }
+h2 { font: 700 26px/1.1 var(--display); margin: 0; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+h3 { font: 600 12px/1 var(--body); text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin: 0 0 8px; }
+.key { font: 500 12px/1 var(--mono); background: var(--chip); border: 1px solid var(--line); border-radius: 4px; padding: 4px 6px; white-space: nowrap; }
+h2 .key { font-size: 16px; padding: 5px 8px; }
+.kinds { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
+.kind { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 12px; }
+.kind p { margin: 0 0 8px; color: var(--muted); font-size: 13px; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chips a { text-decoration: none; color: var(--ink); }
+.toc { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 18px; }
+.tocrow { display: flex; flex-wrap: wrap; gap: 6px; }
+.tocbtn { display: flex; flex-direction: column; gap: 2px; padding: 6px 8px; border: 1px solid var(--line); border-radius: 6px; background: var(--panel); color: var(--ink); text-decoration: none; min-width: 0; max-width: 100%; }
+.tocbtn b { font: 500 12px/1.2 var(--mono); }
+.tocbtn small { color: var(--muted); font-size: 11px; line-height: 1.2; }
+.tocbtn:hover { border-color: var(--accent); }
+.entry { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 18px; display: flex; flex-direction: column; gap: 14px; scroll-margin-top: 80px; }
+.entry header { display: flex; flex-wrap: wrap; align-items: baseline; gap: 12px; }
+.screen { margin: 0; color: var(--accent); font: 600 15px/1.3 var(--body); }
+.body { display: grid; grid-template-columns: minmax(0, 400px) minmax(0, 1fr); gap: 18px; align-items: start; }
+@media (max-width: 760px) { .body { grid-template-columns: 1fr; } }
+figure { margin: 0; }
+.main img, .step img { display: block; width: 100%; max-width: 100%; height: auto; image-rendering: pixelated; border-radius: 4px; border: 1px solid var(--line); background: #000; cursor: zoom-in; }
+.facts { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.facts p { margin: 0; }
+.does { background: var(--does); border-radius: 6px; padding: 10px 12px; }
+.does b { display: block; font: 600 12px/1 var(--body); text-transform: uppercase; letter-spacing: .08em; color: var(--accent); margin-bottom: 6px; }
+.tablewrap { overflow-x: auto; }
+.info { border-collapse: collapse; width: 100%; font-size: 14px; }
+.info th { text-align: left; font: 500 12px var(--mono); color: var(--muted); padding: 6px 10px 6px 0; white-space: nowrap; vertical-align: top; }
+.info td { padding: 6px 10px; border-left: 1px solid var(--line); vertical-align: top; }
+.seen { color: var(--muted); font-size: 14px; }
+.guide { font-size: 13px; color: var(--teal); }
+.steps { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 12px; }
+.step figcaption { display: flex; flex-direction: column; gap: 4px; padding-top: 6px; font-size: 12px; }
+.step figcaption span { color: var(--muted); }
+.quiet { margin: 0; color: var(--muted); font-size: 13px; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+footer { color: var(--muted); font-size: 13px; }
+#zoom { position: fixed; inset: 0; background: rgba(0,0,0,.85); display: flex; align-items: center; justify-content: center; padding: 24px; z-index: 20; }
+#zoom img { width: min(960px, 100%); image-rendering: pixelated; }
+[hidden] { display: none !important; }

@@ -1,0 +1,6 @@
+# Lab only. Device rule 90-edisks-az07 ignores the built-in eMMC by its platform path
+# (fe310000.mmc). The virtual eMMC is the virtio disk with serial "mpclab-emmc".
+SUBSYSTEM=="block", ENV{ID_SERIAL}=="mpclab-emmc", ENV{EDISKSD_IGNORE}="1"
+SUBSYSTEM=="block", ATTRS{serial}=="mpclab-emmc", ENV{EDISKSD_IGNORE}="1"
+# the lab layer disk is not user storage either
+SUBSYSTEM=="block", ATTRS{serial}=="mpclab-layer", ENV{EDISKSD_IGNORE}="1"

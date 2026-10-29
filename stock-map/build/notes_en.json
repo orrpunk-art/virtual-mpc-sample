@@ -1,0 +1,582 @@
+{
+ "SAMPLE": {
+  "screen": "Sample: the pad sound editor",
+  "keys": [
+   "Trim → Mix → Amp Env (cycles)",
+   "Tune → Play",
+   "Filter → Flt Env"
+  ],
+  "knobs": [
+   "Start · Volume · Attack · Semi Tune · Mono/Poly · Cutoff",
+   "End · (⇧ Kit Volume) · Decay/Release · Fine Tune · Mute Grp · Reso",
+   "Loop · Pan · Vel Sens · Warp · Offset · filter type"
+  ],
+  "data": "push moves the frame to the next parameter; turn changes the framed one (End in the shot)",
+  "note": "The home screen for the whole map. Pressing the SCREEN button of the selected tab again pages through it (dots under the tab). Icons right of the sample name: note = Note On (SHIFT + CHOP), arrow = Reverse (SHIFT + LOOP), loop = LOOP, 16 = 16 LEVELS. With SHIFT held the labels change: SCREEN 1 Loop Lock (padlock at Loop), SCREEN 2 Normalize (normalizes the sample, its name gets \"-Normalized\"), K1–K3 Zoom: Start / Zoom: End / Zoom: Loop.",
+  "steps": {
+   "SCREEN 1": "tab 1, next page (Trim → Mix)",
+   "SCREEN 2": "Tune tab: Semi Tune, Fine Tune, Warp",
+   "SCREEN 3": "Filter tab: Cutoff, Reso, type",
+   "SCREEN 1|SCREEN 1": "Amp Env: Attack, Decay, Vel Sens",
+   "SCREEN 2|SCREEN 2": "Play: Mono, Mute Grp, Offset",
+   "SCREEN 3|SCREEN 3": "Flt Env: Attack, Decay, Depth",
+   "DATA": "the frame moves to End",
+   "turn:1": "turning changes End",
+   "SHIFT+SCREEN 1": "Loop Lock on/off (padlock at Loop)",
+   "SHIFT+SCREEN 2": "Normalize: the sample is normalized"
+  },
+  "does": "The main mode: play samples on the pads and shape their sound. Hitting a pad plays it and shows its waveform; SAMPLE + pad selects a pad silently. Tabs: Trim (start, end, loop point), Mix (volume, pan; ⇧K2 kit volume), Amp Env (attack, decay or release, velocity sensitivity), Tune (semitones, cents, Warp; ⇧K3 number of beats), Play (Mono/Poly, mute group; ⇧K2 Pad Link, Offset delays the start), Filter (cutoff, resonance, type: Classic modelled on the MPC3000, LPF/HPF/BPF 2 or 4 pole) and Flt Env (filter envelope). ⇧B1 Loop Lock ties the loop start to the sample start; ⇧B2 Normalize raises the peak to 0 dB.",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/sample_mode.htm"
+ },
+ "SEQ": {
+  "screen": "Seq: sequence, tempo, transport",
+  "keys": [
+   "tempo (128.00)",
+   "BPM: SEQ ↔ GBL (sequence or global tempo)",
+   "Rec Quant on/off"
+  ],
+  "knobs": [
+   "length: 2 Bars",
+   "Q 1/16 (quantize)",
+   "RT Swing"
+  ],
+  "data": "turning moves the position (001.01 → 001.02)",
+  "note": "On screen: sequence number (Seq A01), time signature 4/4, metronome Rec, count 1234, position \"bar.beat.tick\".",
+  "steps": {
+   "SCREEN 2": "BPM: SEQ → GBL",
+   "SCREEN 3": "Rec Quant goes off",
+   "turn:1": "position 001.02"
+  },
+  "does": "Sequence mode: pads select a sequence (green ones hold notes), PLAY launches it, hitting another pad while playing queues the next one. Hold B1 and turn the wheel for tempo; B2 sets a tempo per sequence (SEQ) or one for all (GBL); B3 toggles record quantize. K1 length (1–128 bars, any with ⇧), K2 grid Q, K3 live swing; ⇧K2 time signature, ⇧K3 metronome volume. The wheel moves the position by beats (by Q with ⇧). SEQ + SAMPLE together: the sequence screen while the pads play samples.",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/sequence_mode.htm"
+ },
+ "PAD FX": {
+  "screen": "Pad FX: 16 effects on the pads",
+  "keys": [
+   "Latch (keep the effect without holding the pad)",
+   "–",
+   "–"
+  ],
+  "knobs": [
+   "parameter 1 of the selected effect (Half Speed: Speed)",
+   "Mix",
+   "–"
+  ],
+  "note": "Pads 1–16: Beat Repeat, Rev Stepper, Delay, Reverb, Ring Mod, LoFi, Color, Granulator, Comb Filter, LP Filter, HP Filter, BP Filter, Half Speed, Chorus, Flanger, Phaser. An effect works while its pad is held (or latched).",
+  "steps": {
+   "SCREEN 1": "Latch on, a padlock on the effect"
+  },
+  "does": "Effects on the pads over the whole sequence: a pad engages its effect, more pressure means more effect. Up to four at once; a fifth bypasses the first one. K1–K3 are the effect parameters (each effect has its own), B1 Latch holds the effect at the current amount.",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/pad_fx.htm"
+ },
+ "KNOB FX": {
+  "screen": "Knob FX: the knobs play an effect",
+  "keys": [
+   "tabs of the current screen",
+   "",
+   ""
+  ],
+  "knobs": [
+   "Frequency (effect parameter 1)",
+   "Resonance",
+   "–"
+  ],
+  "note": "\"Knob FX: LP Filter\" pops up and the bottom row turns orange: K1–K3 play the effect picked in FX SELECT, over any screen. KNOB FX again gives the knobs back their usual job.",
+  "steps": {
+   "SCREEN 1": "the Sample tabs work as usual",
+   "SCREEN 3": "Filter, the knobs stay on the effect"
+  },
+  "does": "K1–K3 play one chosen effect (picked in FX SELECT) while the pads stay free for samples or Pad FX at the same time. While Knob FX is on the knobs do not edit page parameters. The effect acts on the chosen pads or on all of them.",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/knob_fx.htm"
+ },
+ "ERASE": {
+  "screen": "the Sample screen stays",
+  "note": "A single ERASE press opens nothing visible: it is held together with another button or a pad (the walk did not press such pairs). The Sample tabs work as usual.",
+  "steps": {
+   "SHIFT+SCREEN 1": "Loop Lock on/off (padlock at Loop)"
+  },
+  "does": "Erasing. Stopped, in Sample mode: ERASE + pad removes the sample from the pad. While playing, ERASE + holding a pad erases its notes from the sequence. In Seq mode ERASE + pad erases a sequence. ERASE + turning a knob erases that parameter's recorded automation (confirm with B3).",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/features.htm"
+ },
+ "NOTE REPEAT": {
+  "screen": "Note Repeat: the repeat rate",
+  "keys": [
+   "1/8",
+   "1/16",
+   "1/32"
+  ],
+  "exit": "NOTE REPEAT again; SAMPLE and other modes do not turn it off",
+  "note": "The mode stays on: a row of rates replaces the tabs, the screen you were on stays below. The walk did not hit pads in this mode. Pressing the selected rate again clears it; SHIFT + SCREEN leaves all three unselected too.",
+  "steps": {
+   "SCREEN 2": "1/16",
+   "SCREEN 3": "1/32",
+   "SCREEN 1": "1/8",
+   "SHIFT+SCREEN 1": "no rate selected",
+   "turn:1": "DATA edits the Sample parameter under the rate row"
+  },
+  "does": "Note repeat: while on, a held pad retriggers at the chosen division (B1–B3: 1/8, 1/16, 1/32). Holding NOTE REPEAT engages it only while held. With SHIFT held the divisions become triplets. The Swing from Time Correct affects the repeats too.",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/features.htm"
+ },
+ "PAD BANK": {
+  "screen": "the Sample screen stays, the pad bank changes",
+  "note": "PAD BANK steps through pad banks A → B → … → H (shown by the bank lights, not on screen). SHIFT + PAD BANK steps backwards (checked separately through the bank letter).",
+  "does": "Pad banks A–H: each press goes to the next bank. PAD BANK + pads 1–8 jumps straight to bank A–H. The current bank is shown next to MAIN VOLUME.",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/features.htm"
+ },
+ "CHOP": {
+  "screen": "Chop: slicing the sample",
+  "keys": [
+   "Chop → Mix → Amp Env",
+   "Tune → Play",
+   "Filter → Flt Env"
+  ],
+  "knobs": [
+   "Start (slices)",
+   "End",
+   "Chop Type (how to slice)"
+  ],
+  "data": "push: frame to the next parameter; turn changes it",
+  "exit": "CHOP again (SAMPLE does not turn it off)",
+  "note": "Tab 1 becomes Chop: slice lines on the waveform, the slice number top right. With SHIFT held the labels change: SCREEN 1 Extract, SCREEN 2 Split, SCREEN 3 Merge; K1 Zoom: Start, K2 Zoom: End, K3 Threshold.",
+  "steps": {
+   "SHIFT+SCREEN 1": "Extract: the slice goes to a free pad (\"Extracted to: Pad A04\"), the project changes",
+   "SHIFT+SCREEN 2": "Split",
+   "SHIFT+SCREEN 3": "Merge",
+   "SCREEN 1|SCREEN 1": "Amp Env of the current slice"
+  },
+  "does": "Slicing: the sample on the selected pad is chopped automatically (by level threshold by default) and the pads play the slices. K3 picks how: Threshold, Regions 4/8/16 (even) or Manual (tap pads along with the music, up to 16 slices); ⇧K3 sets the threshold. ⇧B1 Extract makes the selected slice a new sample on a free pad (the original stays), ⇧B2 Split halves a slice, ⇧B3 Merge joins it with the previous one, ERASE + pad removes a slice. Slice edits cannot be undone. CHOP again leaves.",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/pad_play.htm"
+ },
+ "MUTE": {
+  "screen": "the Sample screen stays",
+  "note": "The screen does not change. By its name this is the pad mute mode; the walk did not hit pads and the lights are not in the shots. SHIFT + MUTE is UNMUTE ALL (printed on the panel).",
+  "does": "Mute mode: the pads stop triggering and mute or unmute sounds instead (red muted, yellow playing). Notes stay in the sequence, handy for live arranging. Holding MUTE engages it only while held. Works in any mode.",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/pad_play.htm"
+ },
+ "LOOP": {
+  "screen": "Sample: loop on",
+  "note": "The screen does not change; the loop icon by the sample name (third) turns blue. LOOP again turns it off. SHIFT + LOOP is REVERSE (printed on the panel).",
+  "does": "Loop for the selected pad: a hit starts the sample; at its end it returns to the loop point (K3 on Trim) and keeps playing; another hit stops it. Loop Lock is on by default, so the loop starts at the sample start.",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/pad_play.htm"
+ },
+ "16 LEVELS": {
+  "screen": "Sample: 16 Levels on",
+  "note": "The screen does not change; the \"16\" icon by the sample name turns white. Pressing again turns it off. SHIFT + 16 LEVELS is TYPE (printed on the panel).",
+  "does": "One sample is spread across all 16 pads, with one parameter rising from pad to pad: level (Velocity), filter cutoff (Filter) or pitch (Tune, original pitch on pad 4). SHIFT + 16 LEVELS changes the type.",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/pad_play.htm"
+ },
+ "SAMPLE SELECT": {
+  "screen": "Sample Select: the sample browser",
+  "keys": [
+   "Back (inside a folder)",
+   "Internal (storage)",
+   "Preview (inside a folder)"
+  ],
+  "data": "turn picks a row, push opens the folder (in a folder: picks the file)",
+  "note": "The path at the bottom (Samples/808), the storage on top. At the root SCREEN 1–3 do nothing.",
+  "steps": {
+   "DATA": "folder 808 open: Back, Internal, Preview",
+   "turn:1": "the next row is selected"
+  },
+  "does": "Browser: pick a sample for the current pad from internal memory or a microSD card. Wheel or −/+ to browse, wheel push opens a folder or loads; B1 back, B2 internal or card (MPC-Sample/Samples on the card), B3 auto-preview of the highlighted file.",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/loading_and_saving_samples.htm"
+ },
+ "TAP TEMPO": {
+  "screen": "the Sample screen stays",
+  "note": "One press shows nothing: the tempo is tapped with several presses (the walk did not do that). SHIFT + TAP TEMPO is METRO (printed on the panel).",
+  "does": "Tap in time to set the project tempo. Holding TAP TEMPO and turning the wheel opens a BPM window for exact tempo.",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/features.htm"
+ },
+ "MINUS": {
+  "screen": "the Sample screen stays",
+  "note": "MINUS lowers the framed parameter by one step; Start is already at zero, so nothing visible. SHIFT + MINUS is UNDO (printed on the panel).",
+  "does": "Lowers the selected parameter by one step, or moves down a list.",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/features.htm"
+ },
+ "PLUS": {
+  "screen": "the Sample screen stays: parameter +1 step",
+  "note": "PLUS raises the framed parameter by one step: in the shot Start moved (the mark at the waveform start). SHIFT + PLUS is REDO (printed on the panel).",
+  "does": "Raises the selected parameter by one step, or moves up a list.",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/features.htm"
+ },
+ "SAMPLE RECORD": {
+  "screen": "Sample Record: \"Tap pad to record\"",
+  "keys": [
+   "input monitoring: On → Off",
+   "–",
+   "–"
+  ],
+  "knobs": [
+   "source: Resample (segments: inputs)",
+   "Free (record length)",
+   "Thresh (start threshold)"
+  ],
+  "note": "Hitting a pad picks where to record. Monitoring top left (On / Off / Auto), threshold icon top right. SHIFT + SCREEN 1 sets monitoring to Auto.",
+  "steps": {
+   "SCREEN 1": "monitoring Off",
+   "SHIFT+SCREEN 1": "monitoring Auto"
+  },
+  "does": "Record your own samples. B1 input monitoring (Off, Auto only on this screen, On). K1 source: built-in mic, rear inputs (stereo or L/R), Resample (what the MPC itself plays), USB. K2 length: Free or the sequence length (Seq). K3 threshold: recording starts when the input gets louder. Hitting a pad starts recording onto it, hitting other pads adds chop points, the same pad, STOP or SAMPLE RECORD stops.",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/sample_record_mode.htm"
+ },
+ "SEQ RECORD": {
+  "screen": "the current screen stays, recording armed",
+  "note": "The screen does not change; the small mark in the top left corner turns from green to red (sequence recording armed, it usually starts with PLAY). The Sample tabs work. SHIFT + SEQ RECORD is RECALL (printed on the panel).",
+  "does": "Sequence recording: the button flashes (armed) and the pads play samples. PLAY starts recording; at the end the MPC keeps overdubbing on each loop. SEQ RECORD again stops recording but keeps playing; STOP stops both. While recording, knobs and fader record automation; ⇧− undoes everything since recording began.",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/recording_sequences.htm"
+ },
+ "PLAY": {
+  "screen": "the current screen stays, the sequence plays",
+  "note": "A green bar grows along the top edge: the position in the sequence. The screen and tabs work as usual. SHIFT + PLAY is CONTINUE (printed on the panel).",
+  "does": "Starts playback (or recording) from the start of the sequence.",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/features.htm"
+ },
+ "STOP": {
+  "screen": "the current screen stays",
+  "note": "Stops playback. SHIFT + STOP while playing stops and returns the position to the start (001.01, checked on the Seq screen).",
+  "does": "Stops playback or recording. A quick double press stops all sound.",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/features.htm"
+ },
+ "DATA": {
+  "screen": "Sample: frame to the next parameter",
+  "note": "Pushing the wheel moves the frame (which parameter DATA edits) to the next one: Start → End → Loop. Turning changes the framed parameter. On Mix, Filter and Amp Env the frame walks K1–K3 the same way.",
+  "does": "The wheel: turn to browse menus and change values, push to select. On the Sample page a push picks which K1–K3 parameter the wheel (and −/+) edits.",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/sample_mode.htm"
+ },
+ "SHIFT+SAMPLE": {
+  "screen": "INPUT CONFIG: recording settings",
+  "keys": [
+   "Back (to Sample)",
+   "–",
+   "–"
+  ],
+  "data": "turn picks a row, push edits it (the row turns blue)",
+  "note": "Rows: Source (Resample), Monitor (On), Threshold (−40 dB), Rec Length (Free), Rec Input Effects (Off). The same settings as on the SAMPLE RECORD screen.",
+  "steps": {
+   "SCREEN 1": "Back: the Sample screen",
+   "DATA": "editing Source"
+  },
+  "does": "INPUT CONFIG, what and how to record: Source (mic, rear inputs, Resample, USB), Monitor (Off/Auto/On), Threshold (−96…0 dB, start level), Rec Length (Free or the sequence length), Rec Input Effects (whether Knob FX is printed into the sample). All but the last are also on the Sample Record screen.",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/input_configuration.htm"
+ },
+ "SHIFT+SEQ": {
+  "screen": "STEP EDIT: the sequence event list",
+  "keys": [
+   "–",
+   "–",
+   "Erase (delete event)"
+  ],
+  "knobs": [
+   "2 Bars",
+   "Q 1/16",
+   "Velocity"
+  ],
+  "note": "Tempo, sequence number and position (002.03.240) on top, events in the middle (here \"No Events\").",
+  "does": "STEP EDIT, edit notes step by step. Wheel moves through steps of the Q grid, −/+ or a pad hit selects a note on the step, the fader nudges it earlier or later, K3 sets its velocity, B3 deletes it; K1 length, K2 grid; hold B1 + wheel for tempo. ERASE + pad erases all notes of that pad (confirm with B3).",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/step_edit.htm"
+ },
+ "SHIFT+PAD FX": {
+  "screen": "FLEX BEAT: rhythm patterns on the pads",
+  "keys": [
+   "–",
+   "–",
+   "Quantize on/off"
+  ],
+  "knobs": [
+   "One Shot",
+   "–",
+   "Mix"
+  ],
+  "note": "16 pads, 16 patterns (envelope drawings), the selected one is lit. The \"Empty\" title means no pattern set.",
+  "steps": {
+   "SCREEN 3": "Quantize off"
+  },
+  "does": "FLEX BEAT, time effects on the playing sequence: beat chops, DJ-style scratches, trance gates (they bend pitch, time and volume). Pad 1 is empty (no effect), pads 2–16 are effects. K1: One Shot (plays once, then back to pad 1) or Loop (repeats until another is chosen). K3 dry/wet mix. B3 starts effects on the nearest division.",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/flex_beat.htm"
+ },
+ "SHIFT+KNOB FX": {
+  "screen": "FX SELECT: the effect for Knob FX",
+  "keys": [
+   "–",
+   "All Pads (what it acts on)",
+   "Bypass on/off"
+  ],
+  "knobs": [
+   "Frequency (effect parameter 1)",
+   "Resonance",
+   "–"
+  ],
+  "data": "turning goes through the 28 effects, the selected one becomes Knob FX",
+  "note": "The title is the current effect (LP Filter). The list: filters, compressors, Transient, Noise Gate, distortion, modulation, emulators, delays, reverbs.",
+  "steps": {
+   "SCREEN 3": "Bypass: the effect knobs grey out",
+   "SHIFT+SCREEN 1": "Bypass toggles"
+  },
+  "does": "FX SELECT, which effect Knob FX puts on the knobs and which pads it applies to. Wheel or −/+ browses the effects, wheel push loads one. Hitting a pad enables Knob FX for that pad (bright = on); B2 enables all pads; B3 bypasses the effect.",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/knob_fx.htm"
+ },
+ "SHIFT+ERASE": {
+  "screen": "COPY: nothing changes on screen",
+  "note": "The Sample screen does not change. Copy on MPC Sample copies a pad: source and target are picked with pads (the walk did not hit pads).",
+  "does": "COPY, copies a sample or a sequence. Holding SHIFT + ERASE, hit the destination pads (they turn red, hit again to deselect); release to copy the selected pad onto them.",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/features.htm"
+ },
+ "SHIFT+NOTE REPEAT": {
+  "screen": "Note Repeat (TRIPLET)",
+  "keys": [
+   "1/8",
+   "1/16",
+   "1/32"
+  ],
+  "note": "The same rate row as NOTE REPEAT opens; on the panel this is TRIPLET, but the rate labels on screen are the same (triplets cannot be told apart in the shot).",
+  "does": "TRIPLET: while Note Repeat is on, holding SHIFT turns the B1–B3 divisions into triplets.",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/features.htm"
+ },
+ "SHIFT+PAD BANK": {
+  "screen": "the Sample screen stays",
+  "note": "Pad bank back (H → G → …). Not shown on screen.",
+  "does": "The previous pad bank.",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/features.htm"
+ },
+ "SHIFT+CHOP": {
+  "screen": "Sample: NOTE ON",
+  "note": "The first icon by the sample name (note) turns white: Note On mode is on. SHIFT + CHOP again turns it off.",
+  "does": "NOTE ON for the pad: it sounds only while held and stops on release. Without it the sound plays through (One Shot). In Note On the envelopes show Release instead of Decay.",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/pad_play.htm"
+ },
+ "SHIFT+MUTE": {
+  "screen": "UNMUTE ALL: \"All Mutes Off\"",
+  "note": "\"All Mutes Off\" pops up: all muted pads play again. The screen below stays.",
+  "does": "UNMUTE ALL: unmutes every muted pad at once.",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/pad_play.htm"
+ },
+ "SHIFT+LOOP": {
+  "screen": "REVERSE: the sample backwards",
+  "note": "The second icon by the sample name (arrow) turns white: Reverse is on. Again turns it off.",
+  "does": "REVERSE: the pad plays backwards, from the end to the start (or to the loop point if looping).",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/pad_play.htm"
+ },
+ "SHIFT+16 LEVELS": {
+  "screen": "TYPE: the 16 Levels type",
+  "note": "\"16 Level: Velocity\" pops up: presses pick what differs between the pads in 16 LEVELS mode (Velocity in the shot; the walk did not step through the other types).",
+  "does": "TYPE: what changes across the 16 pads in 16 LEVELS mode, Velocity, Filter or Tune.",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/pad_play.htm"
+ },
+ "SHIFT+SAMPLE SELECT": {
+  "screen": "SAVE SAMPLE: save the sample under a name",
+  "keys": [
+   "Cancel",
+   "Erase (delete a character)",
+   "Do It! (save)"
+  ],
+  "data": "turn changes the character under the cursor, push goes to the next one",
+  "note": "A \"Create name\" field with the sample name, the destination at the bottom (Internal). Do It! saves the file and shows \"Sample Saved: Saved as …\".",
+  "steps": {
+   "SCREEN 3": "Do It!: \"Sample Saved\", the file is written",
+   "SCREEN 1": "Cancel: back to Sample",
+   "SCREEN 2": "Erase: a character is deleted"
+  },
+  "does": "SAVE SAMPLE, saves the selected pad's sample as a file. Wheel picks a letter, wheel push goes to the next, ⇧ for capitals, −/+ moves the cursor, B2 deletes a letter (⇧B2 all), B3 Do It! saves, B1 cancels.",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/loading_and_saving_samples.htm"
+ },
+ "SHIFT+TAP TEMPO": {
+  "screen": "METRO: metronome on/off",
+  "note": "\"Metronome Off\" / \"On\" / \"Record\" pops up: each press steps to the next state.",
+  "does": "METRO: cycles the metronome, Off, On (play and record), Record (only while recording). Its level is ⇧K3 on the Seq screen.",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/sequence_mode.htm"
+ },
+ "SHIFT+MINUS": {
+  "screen": "UNDO: undo the last action",
+  "note": "\"Undo: <what was undone>\" pops up (\"Set Metronome\" in the shot). The screen below stays.",
+  "does": "UNDO: undoes the last action.",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/features.htm"
+ },
+ "SHIFT+PLUS": {
+  "screen": "REDO: redo what was undone",
+  "note": "\"Redo: <what was redone>\" pops up (\"Set Metronome\" in the shot).",
+  "does": "REDO: redoes what was undone.",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/features.htm"
+ },
+ "SHIFT+SAMPLE RECORD": {
+  "screen": "RECALL: bring back the last recording",
+  "note": "\"Sample Recall: Recalled into A04\" pops up: the last recording (from Sample Record) goes to a free pad.",
+  "does": "RECALL: the last 25 seconds of the selected input go onto the next free pad, for the moment you forgot to record.",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/sample_record_mode.htm"
+ },
+ "SHIFT+SEQ RECORD": {
+  "screen": "RECALL (sequence): nothing changes on screen",
+  "note": "Nothing visible on the Sample screen.",
+  "does": "RECALL for sequences: whatever you played on the pads during the last loop is added to the sequence.",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/recording_sequences.htm"
+ },
+ "SHIFT+PLAY": {
+  "screen": "CONTINUE: carry on from where it stopped",
+  "note": "Playback continues from the position where it stopped (the green bar on top does not start from zero).",
+  "does": "CONTINUE: play from the current position (in Song, from the highlighted sequence).",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/song_mode.htm"
+ },
+ "SHIFT+STOP": {
+  "screen": "the current screen stays",
+  "note": "Nothing visible with the transport stopped. While playing, SHIFT + STOP stops and returns the position to the start (checked on the Seq screen).",
+  "does": "The guide lists no separate SHIFT + STOP function.",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/features.htm"
+ },
+ "SHIFT+PAD 1": {
+  "screen": "FULL LEVEL: \"Full Level Enabled\"",
+  "note": "\"Full Level: Enabled\" / \"Disabled\" pops up: the pads play at full level whatever the hit strength.",
+  "does": "FULL LEVEL: all pads play at full velocity however hard you hit.",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/features.htm"
+ },
+ "SHIFT+PAD 2": {
+  "screen": "HALF SEQ: \"Seq A01 halved\"",
+  "note": "\"Half Seq: Seq A01 halved\" pops up: the sequence becomes half as long. The screen below stays.",
+  "does": "HALF SEQ: the sequence becomes half as long (4 bars → 2).",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/editing_sequences.htm"
+ },
+ "SHIFT+PAD 3": {
+  "screen": "DOUBLE SEQ: \"Seq A01 doubled\"",
+  "note": "The sequence becomes twice as long (repeated). A popup over the current screen.",
+  "does": "DOUBLE SEQ: the sequence doubles in length with its notes copied (4 bars → 8).",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/editing_sequences.htm"
+ },
+ "SHIFT+PAD 4": {
+  "screen": "COUNT-IN: count before recording",
+  "note": "\"Count-In: Disabled\" / \"Enabled\" pops up: each press toggles the count-in.",
+  "does": "COUNT-IN: one bar of count before recording (the 1234 icon is red when on).",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/sequence_mode.htm"
+ },
+ "SHIFT+PAD 5": {
+  "screen": "COMPRESSOR: the master compressor",
+  "keys": [
+   "Color on/off (sound colouring)",
+   "–",
+   "Bypass on/off"
+  ],
+  "knobs": [
+   "Attack",
+   "Release",
+   "Amount"
+  ],
+  "note": "A screen of its own with a picture and level meters on the right. In Bypass the character \"sleeps\" and the meters go dark. In the project this is the Color Compressor effect on the master.",
+  "steps": {
+   "SCREEN 1": "Color on",
+   "SCREEN 3": "Bypass: compressor off",
+   "SHIFT+SCREEN 1": "no Color, in Bypass"
+  },
+  "does": "COMPRESSOR on the main mix, mainly a \"pumping\" compressor but also fine for gentle peak limiting. K1 attack (0.1–150 ms), K2 release (3–300 ms), K3 amount (threshold and ratio in one knob), ⇧K3 input boost. B1 Color adds \"tape warmth\": a little bass, pitch wobble, saturation. B3 bypasses it.",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/compressor.htm"
+ },
+ "SHIFT+PAD 6": {
+  "screen": "HALF SPEED: \"Seq A01 event speed halved\"",
+  "note": "The sequence events are stretched by two (it plays twice as slow).",
+  "does": "HALF SPEED: the sequence notes play at half speed (1/8 hats become 1/4).",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/editing_sequences.htm"
+ },
+ "SHIFT+PAD 7": {
+  "screen": "DOUBLE SPEED: \"Seq A01 event speed doubled\"",
+  "note": "The sequence events are squeezed by two.",
+  "does": "DOUBLE SPEED: the sequence notes play twice as fast (1/8 → 1/16).",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/editing_sequences.htm"
+ },
+ "SHIFT+PAD 8": {
+  "screen": "MIDI CONFIG: MIDI settings",
+  "keys": [
+   "Back",
+   "–",
+   "–"
+  ],
+  "data": "turn picks a row, push edits it",
+  "note": "Rows: MIDI Port (External), MIDI In Channel (All), MIDI Out Channel (1), Pad MIDI In (On), Pad MIDI Out (Always), MIDI Sync In (Off), MIDI Sync Out (MIDI Clock). Version v1.3.0 on the right. Pad MIDI In and MIDI Sync Out had been switched on in this lab beforehand.",
+  "does": "MIDI CONFIG: MIDI port (jacks or USB), in and out channels, whether pads react to and send MIDI, sync in and out (MIDI Clock or MTC), MIDI Thru, Program Change to switch sequences, CV sync on SYNC OUT. Also Takeover, how knobs and fader catch a value: Pickup (waits until they match), Scaled (catches up gradually, the knob default) or Instant (jumps at once). And resets of settings or all data (careful, irreversible).",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/midi_configuration.htm"
+ },
+ "SHIFT+PAD 9": {
+  "screen": "FADER: what the fader does",
+  "keys": [
+   "Back",
+   "–",
+   "ON (fader active)"
+  ],
+  "data": "turn picks an assignment, push selects it",
+  "note": "Fader assignments: Pad Volume, Pad Pan, Pad Tune, Pad Amp Attack, Pad Amp Decay, Pad Filter Cutoff, Kit Volume…",
+  "does": "FADER, what the fader moves: pad volume, pan, tune, attack or decay/release, filter cutoff, or the whole kit volume. B3 turns the fader on or off. Its LED brightness shows the value: if the fader position does not match, move it until the LED starts to change.",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/fader.htm"
+ },
+ "SHIFT+PAD 10": {
+  "screen": "REC QUANTIZE: quantize while recording",
+  "note": "\"Rec Quantize: Off\" / \"On\" pops up: toggles quantize while recording (the same as Rec Quant on the Seq screen).",
+  "does": "REC QUANTIZE: everything you record snaps to the Q grid.",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/editing_sequences.htm"
+ },
+ "SHIFT+PAD 11": {
+  "screen": "RESAMPLE: \"Resample Seq: Select pad\"",
+  "keys": [
+   "Cancel",
+   "–",
+   "–"
+  ],
+  "note": "Records the sequence into a sample: hit the pad to record into. SCREEN 1 cancels.",
+  "does": "RESAMPLE: renders the whole sequence into a new sample on the pad you hit. Frees pads and lets you bake a beat.",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/editing_sequences.htm"
+ },
+ "SHIFT+PAD 12": {
+  "screen": "SONG: a song of sequences",
+  "keys": [
+   "Export",
+   "Remove",
+   "Insert"
+  ],
+  "note": "The song screen; \"Empty Song\" in this project. Buttons: Export, Remove, Insert (the walk did not try them, the song is empty).",
+  "does": "SONG, a song of sequences: a pad selects a sequence, B3 inserts it into the list, wheel or −/+ browse it, B2 removes, PLAY plays the song from the top. B1 exports: to an audio file (named) or to a new sequence in the project.",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/song_mode.htm"
+ },
+ "SHIFT+PAD 13": {
+  "screen": "TRIM SAMPLE: nothing changes on screen",
+  "note": "Nothing visible on screen.",
+  "does": "TRIM SAMPLE: cuts everything before Start and after End from the sample.",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/features.htm"
+ },
+ "SHIFT+PAD 14": {
+  "screen": "TIME CORRECT: quantize what was played",
+  "keys": [
+   "Cancel",
+   "All (all pads)",
+   "Do It!"
+  ],
+  "knobs": [
+   "Q 1/8 (grid)",
+   "Shift",
+   "Swing"
+  ],
+  "note": "A grid of pads A1–A16: which pads to correct. Do It! moves the sequence events onto the Q grid.",
+  "does": "TIME CORRECT, align notes already recorded. Pads pick whose notes (B2 all), K1 grid Q, K2 Shift moves them slightly earlier or later for feel, K3 Swing adds shuffle. B3 Do It! applies, ⇧− undoes. Q and Swing are project-wide.",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/time_correct.htm"
+ },
+ "SHIFT+PAD 15": {
+  "screen": "WARP: \"Warp: Time stretch\"",
+  "note": "\"Warp: Time stretch\" pops up (the next press gives Pitch).",
+  "does": "WARP: toggles the Warp mode between Time Stretch (length and tempo change, pitch stays) and Pitch (length and pitch change together). The Warp value itself is K3 on the Tune tab.",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/sample_mode.htm"
+ },
+ "SHIFT+PAD 16": {
+  "screen": "PROJECT: projects",
+  "keys": [
+   "Back",
+   "–",
+   "–"
+  ],
+  "data": "turn picks a row, push opens it",
+  "note": "Menu: Load Project, Save Project, New Project, SD Card Access. Load Project opens the project browser (Internal: Demos, Kits, User).",
+  "steps": {
+   "DATA": "Load Project: the Projects browser (Demos, Kits, User)"
+  },
+  "does": "PROJECT: Load Project (Demos, Kits: a kit with four sequences, B3 Load Kit for sounds only, User), Save Project (name, B3 Do It!), New Project, SD Card Access: the microSD card shows up on a computer over USB (eject it on the computer before leaving). The MPC also saves the project in the background.",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/project.htm"
+ },
+ "SHIFT+DATA": {
+  "screen": "Sample: frame to the previous parameter",
+  "note": "SHIFT + pushing the wheel moves the frame back (Start → Loop); without SHIFT, forward.",
+  "does": "On the Sample page: steps the wheel's parameter backwards.",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/sample_mode.htm"
+ }
+}

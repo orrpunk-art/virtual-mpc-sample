@@ -1,0 +1,83 @@
+[
+ {
+  "name": "Левая колонка",
+  "entries": [
+   "SAMPLE",
+   "SHIFT+SAMPLE",
+   "SEQ",
+   "SHIFT+SEQ",
+   "PAD FX",
+   "SHIFT+PAD FX",
+   "KNOB FX",
+   "SHIFT+KNOB FX",
+   "PAD BANK",
+   "SHIFT+PAD BANK",
+   "ERASE",
+   "SHIFT+ERASE",
+   "NOTE REPEAT",
+   "SHIFT+NOTE REPEAT"
+  ]
+ },
+ {
+  "name": "Правая колонка",
+  "entries": [
+   "CHOP",
+   "SHIFT+CHOP",
+   "MUTE",
+   "SHIFT+MUTE",
+   "LOOP",
+   "SHIFT+LOOP",
+   "16 LEVELS",
+   "SHIFT+16 LEVELS",
+   "SAMPLE SELECT",
+   "SHIFT+SAMPLE SELECT",
+   "TAP TEMPO",
+   "SHIFT+TAP TEMPO",
+   "MINUS",
+   "SHIFT+MINUS",
+   "PLUS",
+   "SHIFT+PLUS"
+  ]
+ },
+ {
+  "name": "Запись и транспорт",
+  "entries": [
+   "SAMPLE RECORD",
+   "SHIFT+SAMPLE RECORD",
+   "SEQ RECORD",
+   "SHIFT+SEQ RECORD",
+   "PLAY",
+   "SHIFT+PLAY",
+   "STOP",
+   "SHIFT+STOP"
+  ]
+ },
+ {
+  "name": "Колесо DATA",
+  "entries": [
+   "DATA",
+   "SHIFT+DATA"
+  ]
+ },
+ {
+  "name": "SHIFT + пэды (подписи под пэдами)",
+  "entries": [
+   "SHIFT+PAD 1",
+   "SHIFT+PAD 2",
+   "SHIFT+PAD 3",
+   "SHIFT+PAD 4",
+   "SHIFT+PAD 5",
+   "SHIFT+PAD 6",
+   "SHIFT+PAD 7",
+   "SHIFT+PAD 8",
+   "SHIFT+PAD 9",
+   "SHIFT+PAD 10",
+   "SHIFT+PAD 11",
+   "SHIFT+PAD 12",
+   "SHIFT+PAD 13",
+   "SHIFT+PAD 14",
+   "SHIFT+PAD 15",
+   "SHIFT+PAD 16"
+  ]
+ }
+]

@@ -1,0 +1,582 @@
+{
+ "SAMPLE": {
+  "screen": "Sample：打击垫音色编辑器",
+  "keys": [
+   "Trim → Mix → Amp Env（循环切换）",
+   "Tune → Play",
+   "Filter → Flt Env"
+  ],
+  "knobs": [
+   "Start · Volume · Attack · Semi Tune · Mono/Poly · Cutoff",
+   "End · (⇧ Kit Volume) · Decay/Release · Fine Tune · Mute Grp · Reso",
+   "Loop · Pan · Vel Sens · Warp · Offset · 滤波器类型"
+  ],
+  "data": "按下：选框移到下一个参数；转动：修改选框中的参数（截图中为 End）",
+  "note": "整张地图的起始屏幕。再次按下当前标签页的 SCREEN 按钮可在该标签页内翻页（标签下方的圆点）。采样名称右侧的图标：音符 = Note On（SHIFT + CHOP），箭头 = Reverse（SHIFT + LOOP），循环 = LOOP，16 = 16 LEVELS。按住 SHIFT 时标签会变化：SCREEN 1 为 Loop Lock（Loop 处出现锁形图标），SCREEN 2 为 Normalize（对采样做归一化，名称后加上 \"-Normalized\"），K1–K3 为 Zoom: Start / Zoom: End / Zoom: Loop。",
+  "steps": {
+   "SCREEN 1": "标签页 1，下一页（Trim → Mix）",
+   "SCREEN 2": "Tune 标签页：Semi Tune、Fine Tune、Warp",
+   "SCREEN 3": "Filter 标签页：Cutoff、Reso、类型",
+   "SCREEN 1|SCREEN 1": "Amp Env：Attack、Decay、Vel Sens",
+   "SCREEN 2|SCREEN 2": "Play：Mono、Mute Grp、Offset",
+   "SCREEN 3|SCREEN 3": "Flt Env：Attack、Decay、Depth",
+   "DATA": "选框移到 End",
+   "turn:1": "转动修改 End",
+   "SHIFT+SCREEN 1": "Loop Lock 开/关（Loop 处出现锁形图标）",
+   "SHIFT+SCREEN 2": "Normalize：采样被归一化"
+  },
+  "does": "主模式：用打击垫演奏采样并塑造音色。敲击打击垫会播放采样并显示其波形；SAMPLE + 打击垫可静默选择打击垫。标签页：Trim（起点、终点、循环点）、Mix（音量、声像；⇧K2 为套件音量）、Amp Env（起音、衰减或释放、力度灵敏度）、Tune（半音、音分、Warp；⇧K3 为节拍数）、Play（Mono/Poly、静音组；⇧K2 为 Pad Link，Offset 延迟起点）、Filter（截止频率、共振、类型：仿 MPC3000 的 Classic，LPF/HPF/BPF 2 极或 4 极）以及 Flt Env（滤波器包络）。⇧B1 Loop Lock 将循环起点绑定到采样起点；⇧B2 Normalize 将峰值提升到 0 dB。",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/sample_mode.htm"
+ },
+ "SEQ": {
+  "screen": "Seq：序列、速度、走带控制",
+  "keys": [
+   "速度（128.00）",
+   "BPM：SEQ ↔ GBL（序列速度或全局速度）",
+   "Rec Quant 开/关"
+  ],
+  "knobs": [
+   "长度：2 Bars",
+   "Q 1/16（量化）",
+   "RT Swing"
+  ],
+  "data": "转动移动播放位置（001.01 → 001.02）",
+  "note": "屏幕上：序列编号（Seq A01）、拍号 4/4、节拍器 Rec、预备拍 1234、位置 \"小节.拍.tick\"。",
+  "steps": {
+   "SCREEN 2": "BPM：SEQ → GBL",
+   "SCREEN 3": "Rec Quant 关闭",
+   "turn:1": "位置 001.02"
+  },
+  "does": "序列模式：打击垫选择序列（绿色表示含有音符），PLAY 启动播放，播放中敲击另一个打击垫会把它排为下一个序列。按住 B1 并转动滚轮调速度；B2 设置每个序列独立速度（SEQ）或统一的全局速度（GBL）；B3 切换录音量化。K1 长度（1–128 小节，配合 ⇧ 可设任意值），K2 网格 Q，K3 实时摇摆；⇧K2 拍号，⇧K3 节拍器音量。滚轮按拍移动位置（配合 ⇧ 按 Q 移动）。SEQ + SAMPLE 同时按：显示序列屏幕，同时打击垫演奏采样。",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/sequence_mode.htm"
+ },
+ "PAD FX": {
+  "screen": "Pad FX：打击垫上的 16 种效果器",
+  "keys": [
+   "Latch（无需按住打击垫即可保持效果）",
+   "–",
+   "–"
+  ],
+  "knobs": [
+   "所选效果器的参数 1（Half Speed：Speed）",
+   "Mix",
+   "–"
+  ],
+  "note": "打击垫 1–16：Beat Repeat、Rev Stepper、Delay、Reverb、Ring Mod、LoFi、Color、Granulator、Comb Filter、LP Filter、HP Filter、BP Filter、Half Speed、Chorus、Flanger、Phaser。按住打击垫（或锁定）期间效果器生效。",
+  "steps": {
+   "SCREEN 1": "Latch 开启，效果器上出现锁形图标"
+  },
+  "does": "作用于整个序列的打击垫效果器：按下打击垫即启用对应效果，按压越重效果越强。最多同时四个；第五个会旁通第一个。K1–K3 为效果器参数（每种效果器各不相同），B1 Latch 将效果保持在当前强度。",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/pad_fx.htm"
+ },
+ "KNOB FX": {
+  "screen": "Knob FX：用旋钮演奏效果器",
+  "keys": [
+   "当前屏幕的标签页",
+   "",
+   ""
+  ],
+  "knobs": [
+   "Frequency（效果器参数 1）",
+   "Resonance",
+   "–"
+  ],
+  "note": "弹出 \"Knob FX: LP Filter\"，底部一行变为橙色：K1–K3 在任何屏幕上都演奏在 FX SELECT 中选定的效果器。再按一次 KNOB FX，旋钮恢复原来的功能。",
+  "steps": {
+   "SCREEN 1": "Sample 标签页照常工作",
+   "SCREEN 3": "Filter，旋钮仍控制效果器"
+  },
+  "does": "K1–K3 演奏一个选定的效果器（在 FX SELECT 中选择），同时打击垫仍可自由演奏采样或使用 Pad FX。Knob FX 开启时，旋钮不编辑页面参数。效果器作用于选定的打击垫或全部打击垫。",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/knob_fx.htm"
+ },
+ "ERASE": {
+  "screen": "停留在 Sample 屏幕",
+  "note": "单独按 ERASE 不会打开任何可见内容：它需要与另一个按钮或打击垫一起按住（遍历测试未按这类组合）。Sample 标签页照常工作。",
+  "steps": {
+   "SHIFT+SCREEN 1": "Loop Lock 开/关（Loop 处出现锁形图标）"
+  },
+  "does": "擦除。停止状态下，在 Sample 模式中：ERASE + 打击垫会从打击垫上移除采样。播放中，ERASE + 按住打击垫会从序列中擦除该打击垫的音符。在 Seq 模式中 ERASE + 打击垫擦除一个序列。ERASE + 转动旋钮会擦除该参数已录制的自动化（用 B3 确认）。",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/features.htm"
+ },
+ "NOTE REPEAT": {
+  "screen": "Note Repeat：重复速率",
+  "keys": [
+   "1/8",
+   "1/16",
+   "1/32"
+  ],
+  "exit": "再按 NOTE REPEAT；SAMPLE 和其他模式不会关闭它",
+  "note": "该模式保持开启：一行速率选项取代标签页，下方仍是原来的屏幕。遍历测试在此模式下未敲击打击垫。再次按下已选速率会取消选择；SHIFT + SCREEN 也会让三个都处于未选状态。",
+  "steps": {
+   "SCREEN 2": "1/16",
+   "SCREEN 3": "1/32",
+   "SCREEN 1": "1/8",
+   "SHIFT+SCREEN 1": "未选择速率",
+   "turn:1": "DATA 编辑速率行下方的 Sample 参数"
+  },
+  "does": "音符重复：开启后，按住的打击垫会按所选时值重复触发（B1–B3：1/8、1/16、1/32）。按住 NOTE REPEAT 则仅在按住期间生效。按住 SHIFT 时时值变为三连音。Time Correct 中的 Swing 也会作用于重复音。",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/features.htm"
+ },
+ "PAD BANK": {
+  "screen": "停留在 Sample 屏幕，打击垫库切换",
+  "note": "PAD BANK 依次切换打击垫库 A → B → … → H（由库指示灯显示，屏幕上不显示）。SHIFT + PAD BANK 反向切换（通过库字母另行验证）。",
+  "does": "打击垫库 A–H：每按一次切到下一个库。PAD BANK + 打击垫 1–8 直接跳到库 A–H。当前库显示在 MAIN VOLUME 旁。",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/features.htm"
+ },
+ "CHOP": {
+  "screen": "Chop：切分采样",
+  "keys": [
+   "Chop → Mix → Amp Env",
+   "Tune → Play",
+   "Filter → Flt Env"
+  ],
+  "knobs": [
+   "Start（切片）",
+   "End",
+   "Chop Type（切分方式）"
+  ],
+  "data": "按下：选框移到下一个参数；转动：修改该参数",
+  "exit": "再按 CHOP（SAMPLE 不会关闭它）",
+  "note": "标签页 1 变为 Chop：波形上出现切片线，右上角显示切片编号。按住 SHIFT 时标签会变化：SCREEN 1 为 Extract，SCREEN 2 为 Split，SCREEN 3 为 Merge；K1 为 Zoom: Start，K2 为 Zoom: End，K3 为 Threshold。",
+  "steps": {
+   "SHIFT+SCREEN 1": "Extract：切片被放到一个空闲打击垫上（\"Extracted to: Pad A04\"），工程随之改变",
+   "SHIFT+SCREEN 2": "Split",
+   "SHIFT+SCREEN 3": "Merge",
+   "SCREEN 1|SCREEN 1": "当前切片的 Amp Env"
+  },
+  "does": "切片：所选打击垫上的采样被自动切分（默认按电平阈值），打击垫演奏各个切片。K3 选择切分方式：Threshold、Regions 4/8/16（等分）或 Manual（随音乐敲击打击垫，最多 16 个切片）；⇧K3 设置阈值。⇧B1 Extract 将所选切片变为空闲打击垫上的新采样（原采样保留），⇧B2 Split 将切片一分为二，⇧B3 Merge 将其与前一个切片合并，ERASE + 打击垫删除一个切片。切片编辑无法撤销。再按 CHOP 退出。",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/pad_play.htm"
+ },
+ "MUTE": {
+  "screen": "停留在 Sample 屏幕",
+  "note": "屏幕不变。从名称看这是打击垫静音模式；遍历测试未敲击打击垫，截图中也看不到指示灯。SHIFT + MUTE 为 UNMUTE ALL（面板上印有）。",
+  "does": "静音模式：打击垫不再触发声音，而是将声音静音或取消静音（红色为已静音，黄色为正在播放）。音符仍保留在序列中，适合现场编排。按住 MUTE 则仅在按住期间生效。在任何模式下都可用。",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/pad_play.htm"
+ },
+ "LOOP": {
+  "screen": "Sample：循环开启",
+  "note": "屏幕不变；采样名称旁的循环图标（第三个）变为蓝色。再按 LOOP 关闭。SHIFT + LOOP 为 REVERSE（面板上印有）。",
+  "does": "所选打击垫的循环：敲击后开始播放采样；播放到结尾时返回循环点（Trim 上的 K3）继续播放；再次敲击则停止。Loop Lock 默认开启，因此循环从采样起点开始。",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/pad_play.htm"
+ },
+ "16 LEVELS": {
+  "screen": "Sample：16 Levels 开启",
+  "note": "屏幕不变；采样名称旁的 \"16\" 图标变为白色。再按一次关闭。SHIFT + 16 LEVELS 为 TYPE（面板上印有）。",
+  "does": "一个采样分布到全部 16 个打击垫上，某个参数逐个打击垫递增：电平（Velocity）、滤波器截止频率（Filter）或音高（Tune，打击垫 4 为原始音高）。SHIFT + 16 LEVELS 切换类型。",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/pad_play.htm"
+ },
+ "SAMPLE SELECT": {
+  "screen": "Sample Select：采样浏览器",
+  "keys": [
+   "Back（在文件夹内）",
+   "Internal（存储位置）",
+   "Preview（在文件夹内）"
+  ],
+  "data": "转动选择一行，按下打开文件夹（在文件夹内：选择文件）",
+  "note": "底部为路径（Samples/808），顶部为存储位置。在根目录时 SCREEN 1–3 无作用。",
+  "steps": {
+   "DATA": "已打开文件夹 808：Back、Internal、Preview",
+   "turn:1": "选中下一行"
+  },
+  "does": "浏览器：从内部存储或 microSD 卡为当前打击垫选择采样。用滚轮或 −/+ 浏览，按下滚轮打开文件夹或载入；B1 返回，B2 在内部存储与存储卡之间切换（卡上路径为 MPC-Sample/Samples），B3 自动试听高亮的文件。",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/loading_and_saving_samples.htm"
+ },
+ "TAP TEMPO": {
+  "screen": "停留在 Sample 屏幕",
+  "note": "按一次没有显示：速度需要连续敲击多次（遍历测试未这样做）。SHIFT + TAP TEMPO 为 METRO（面板上印有）。",
+  "does": "按节奏敲击以设置工程速度。按住 TAP TEMPO 并转动滚轮会打开 BPM 窗口，用于精确设置速度。",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/features.htm"
+ },
+ "MINUS": {
+  "screen": "停留在 Sample 屏幕",
+  "note": "MINUS 将选框中的参数减小一步；Start 已为零，因此没有可见变化。SHIFT + MINUS 为 UNDO（面板上印有）。",
+  "does": "将所选参数减小一步，或在列表中向下移动。",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/features.htm"
+ },
+ "PLUS": {
+  "screen": "停留在 Sample 屏幕：参数 +1 步",
+  "note": "PLUS 将选框中的参数增大一步：截图中 Start 移动了（波形起点处的标记）。SHIFT + PLUS 为 REDO（面板上印有）。",
+  "does": "将所选参数增大一步，或在列表中向上移动。",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/features.htm"
+ },
+ "SAMPLE RECORD": {
+  "screen": "Sample Record：\"Tap pad to record\"",
+  "keys": [
+   "输入监听：On → Off",
+   "–",
+   "–"
+  ],
+  "knobs": [
+   "音源：Resample（分段显示：各输入）",
+   "Free（录音长度）",
+   "Thresh（触发阈值）"
+  ],
+  "note": "敲击打击垫选择录到哪里。左上角为监听状态（On / Off / Auto），右上角为阈值图标。SHIFT + SCREEN 1 将监听设为 Auto。",
+  "steps": {
+   "SCREEN 1": "监听 Off",
+   "SHIFT+SCREEN 1": "监听 Auto"
+  },
+  "does": "录制你自己的采样。B1 输入监听（Off、Auto（仅在此屏幕）、On）。K1 音源：内置麦克风、背板输入（立体声或 L/R）、Resample（MPC 自身播放的声音）、USB。K2 长度：Free 或序列长度（Seq）。K3 阈值：输入音量超过阈值时开始录音。敲击打击垫开始录到该打击垫上，敲击其他打击垫会添加切片点，再敲同一个打击垫、按 STOP 或 SAMPLE RECORD 停止。",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/sample_record_mode.htm"
+ },
+ "SEQ RECORD": {
+  "screen": "停留在当前屏幕，录音待命",
+  "note": "屏幕不变；左上角的小标记由绿色变为红色（序列录音待命，通常按 PLAY 开始）。Sample 标签页照常工作。SHIFT + SEQ RECORD 为 RECALL（面板上印有）。",
+  "does": "序列录音：按钮闪烁（待命），打击垫演奏采样。PLAY 开始录音；到达结尾后 MPC 在每次循环时继续叠录。再按 SEQ RECORD 停止录音但继续播放；STOP 同时停止两者。录音时，旋钮和推子会录制自动化；⇧− 撤销自录音开始以来的全部内容。",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/recording_sequences.htm"
+ },
+ "PLAY": {
+  "screen": "停留在当前屏幕，序列播放",
+  "note": "顶部边缘出现一条逐渐增长的绿色条：表示序列中的位置。屏幕和标签页照常工作。SHIFT + PLAY 为 CONTINUE（面板上印有）。",
+  "does": "从序列开头开始播放（或录音）。",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/features.htm"
+ },
+ "STOP": {
+  "screen": "停留在当前屏幕",
+  "note": "停止播放。播放中按 SHIFT + STOP 会停止并将位置归零到开头（001.01，在 Seq 屏幕上验证）。",
+  "does": "停止播放或录音。快速双击会停止所有声音。",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/features.htm"
+ },
+ "DATA": {
+  "screen": "Sample：选框移到下一个参数",
+  "note": "按下滚轮会将选框（DATA 所编辑的参数）移到下一个：Start → End → Loop。转动修改选框中的参数。在 Mix、Filter 和 Amp Env 上，选框同样在 K1–K3 之间移动。",
+  "does": "滚轮：转动以浏览菜单和修改数值，按下以选择。在 Sample 页面上，按下可选择滚轮（及 −/+）编辑 K1–K3 中的哪个参数。",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/sample_mode.htm"
+ },
+ "SHIFT+SAMPLE": {
+  "screen": "INPUT CONFIG：录音设置",
+  "keys": [
+   "Back（返回 Sample）",
+   "–",
+   "–"
+  ],
+  "data": "转动选择一行，按下编辑该行（该行变为蓝色）",
+  "note": "各行：Source（Resample）、Monitor（On）、Threshold（−40 dB）、Rec Length（Free）、Rec Input Effects（Off）。与 SAMPLE RECORD 屏幕上的设置相同。",
+  "steps": {
+   "SCREEN 1": "Back：返回 Sample 屏幕",
+   "DATA": "编辑 Source"
+  },
+  "does": "INPUT CONFIG，录什么以及怎么录：Source（麦克风、背板输入、Resample、USB）、Monitor（Off/Auto/On）、Threshold（−96…0 dB，触发电平）、Rec Length（Free 或序列长度）、Rec Input Effects（是否将 Knob FX 效果录进采样）。除最后一项外，其余也都在 Sample Record 屏幕上。",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/input_configuration.htm"
+ },
+ "SHIFT+SEQ": {
+  "screen": "STEP EDIT：序列事件列表",
+  "keys": [
+   "–",
+   "–",
+   "Erase（删除事件）"
+  ],
+  "knobs": [
+   "2 Bars",
+   "Q 1/16",
+   "Velocity"
+  ],
+  "note": "顶部为速度、序列编号和位置（002.03.240），中间为事件（此处为 \"No Events\"）。",
+  "does": "STEP EDIT，逐步编辑音符。滚轮按 Q 网格逐步移动，−/+ 或敲击打击垫选择该步上的音符，推子将其微调提前或延后，K3 设置其力度，B3 删除；K1 长度，K2 网格；按住 B1 + 滚轮调速度。ERASE + 打击垫擦除该打击垫的全部音符（用 B3 确认）。",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/step_edit.htm"
+ },
+ "SHIFT+PAD FX": {
+  "screen": "FLEX BEAT：打击垫上的节奏型",
+  "keys": [
+   "–",
+   "–",
+   "Quantize 开/关"
+  ],
+  "knobs": [
+   "One Shot",
+   "–",
+   "Mix"
+  ],
+  "note": "16 个打击垫，16 种节奏型（包络图形），选中的那个亮起。标题为 \"Empty\" 表示未设置节奏型。",
+  "steps": {
+   "SCREEN 3": "Quantize 关闭"
+  },
+  "does": "FLEX BEAT，作用于正在播放的序列的时间类效果器：节拍切片、DJ 风格搓碟、Trance Gate（会改变音高、时间和音量）。打击垫 1 为空（无效果），打击垫 2–16 为效果。K1：One Shot（播放一次后回到打击垫 1）或 Loop（重复直到选择另一个）。K3 干湿比。B3 让效果从最近的时值点开始。",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/flex_beat.htm"
+ },
+ "SHIFT+KNOB FX": {
+  "screen": "FX SELECT：Knob FX 使用的效果器",
+  "keys": [
+   "–",
+   "All Pads（作用对象）",
+   "Bypass 开/关"
+  ],
+  "knobs": [
+   "Frequency（效果器参数 1）",
+   "Resonance",
+   "–"
+  ],
+  "data": "转动浏览 28 种效果器，选中的成为 Knob FX",
+  "note": "标题为当前效果器（LP Filter）。列表：滤波器、压缩器、Transient、Noise Gate、失真、调制、模拟器、延迟、混响。",
+  "steps": {
+   "SCREEN 3": "Bypass：效果器旋钮变灰",
+   "SHIFT+SCREEN 1": "Bypass 切换"
+  },
+  "does": "FX SELECT，选择 Knob FX 放到旋钮上的效果器以及作用于哪些打击垫。滚轮或 −/+ 浏览效果器，按下滚轮载入。敲击打击垫可为该打击垫启用 Knob FX（亮 = 开启）；B2 启用全部打击垫；B3 旁通效果器。",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/knob_fx.htm"
+ },
+ "SHIFT+ERASE": {
+  "screen": "COPY：屏幕无变化",
+  "note": "Sample 屏幕不变。MPC Sample 上的 Copy 用于复制打击垫：源和目标都用打击垫选择（遍历测试未敲击打击垫）。",
+  "does": "COPY，复制采样或序列。按住 SHIFT + ERASE，敲击目标打击垫（变为红色，再敲一次取消选择）；松开后将所选打击垫复制到这些打击垫上。",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/features.htm"
+ },
+ "SHIFT+NOTE REPEAT": {
+  "screen": "Note Repeat（TRIPLET）",
+  "keys": [
+   "1/8",
+   "1/16",
+   "1/32"
+  ],
+  "note": "打开与 NOTE REPEAT 相同的速率行；面板上此组合为 TRIPLET，但屏幕上的速率标签相同（截图中无法分辨三连音）。",
+  "does": "TRIPLET：Note Repeat 开启时，按住 SHIFT 会将 B1–B3 的时值变为三连音。",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/features.htm"
+ },
+ "SHIFT+PAD BANK": {
+  "screen": "停留在 Sample 屏幕",
+  "note": "打击垫库向后切换（H → G → …）。屏幕上不显示。",
+  "does": "上一个打击垫库。",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/features.htm"
+ },
+ "SHIFT+CHOP": {
+  "screen": "Sample：NOTE ON",
+  "note": "采样名称旁的第一个图标（音符）变为白色：Note On 模式开启。再按 SHIFT + CHOP 关闭。",
+  "does": "打击垫的 NOTE ON：仅在按住时发声，松开即停止。未开启时声音会完整播放（One Shot）。在 Note On 下，包络显示 Release 而非 Decay。",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/pad_play.htm"
+ },
+ "SHIFT+MUTE": {
+  "screen": "UNMUTE ALL：\"All Mutes Off\"",
+  "note": "弹出 \"All Mutes Off\"：所有已静音的打击垫恢复发声。下方屏幕不变。",
+  "does": "UNMUTE ALL：一次取消所有已静音打击垫的静音。",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/pad_play.htm"
+ },
+ "SHIFT+LOOP": {
+  "screen": "REVERSE：反向播放采样",
+  "note": "采样名称旁的第二个图标（箭头）变为白色：Reverse 开启。再按一次关闭。",
+  "does": "REVERSE：打击垫反向播放，从终点到起点（循环时到循环点）。",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/pad_play.htm"
+ },
+ "SHIFT+16 LEVELS": {
+  "screen": "TYPE：16 Levels 的类型",
+  "note": "弹出 \"16 Level: Velocity\"：每次按下选择 16 LEVELS 模式下各打击垫之间变化的参数（截图中为 Velocity；遍历测试未逐一切换其他类型）。",
+  "does": "TYPE：16 LEVELS 模式下在 16 个打击垫间变化的参数：Velocity、Filter 或 Tune。",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/pad_play.htm"
+ },
+ "SHIFT+SAMPLE SELECT": {
+  "screen": "SAVE SAMPLE：以指定名称保存采样",
+  "keys": [
+   "Cancel",
+   "Erase（删除一个字符）",
+   "Do It!（保存）"
+  ],
+  "data": "转动修改光标处的字符，按下移到下一个字符",
+  "note": "\"Create name\" 输入框中为采样名称，底部为保存位置（Internal）。Do It! 保存文件并显示 \"Sample Saved: Saved as …\"。",
+  "steps": {
+   "SCREEN 3": "Do It!：\"Sample Saved\"，文件已写入",
+   "SCREEN 1": "Cancel：返回 Sample",
+   "SCREEN 2": "Erase：删除一个字符"
+  },
+  "does": "SAVE SAMPLE，将所选打击垫的采样保存为文件。滚轮选择字母，按下滚轮移到下一个，⇧ 切换大写，−/+ 移动光标，B2 删除一个字母（⇧B2 全部删除），B3 Do It! 保存，B1 取消。",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/loading_and_saving_samples.htm"
+ },
+ "SHIFT+TAP TEMPO": {
+  "screen": "METRO：节拍器开/关",
+  "note": "弹出 \"Metronome Off\" / \"On\" / \"Record\"：每按一次切换到下一个状态。",
+  "does": "METRO：循环切换节拍器状态：Off、On（播放和录音时）、Record（仅录音时）。其音量为 Seq 屏幕上的 ⇧K3。",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/sequence_mode.htm"
+ },
+ "SHIFT+MINUS": {
+  "screen": "UNDO：撤销上一步操作",
+  "note": "弹出 \"Undo: <被撤销的操作>\"（截图中为 \"Set Metronome\"）。下方屏幕不变。",
+  "does": "UNDO：撤销上一步操作。",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/features.htm"
+ },
+ "SHIFT+PLUS": {
+  "screen": "REDO：重做已撤销的操作",
+  "note": "弹出 \"Redo: <被重做的操作>\"（截图中为 \"Set Metronome\"）。",
+  "does": "REDO：重做已撤销的操作。",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/features.htm"
+ },
+ "SHIFT+SAMPLE RECORD": {
+  "screen": "RECALL：找回最近的录音",
+  "note": "弹出 \"Sample Recall: Recalled into A04\"：最近的录音（来自 Sample Record）放到一个空闲打击垫上。",
+  "does": "RECALL：所选输入最近 25 秒的声音会放到下一个空闲打击垫上，适合忘了按录音的时候。",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/sample_record_mode.htm"
+ },
+ "SHIFT+SEQ RECORD": {
+  "screen": "RECALL（序列）：屏幕无变化",
+  "note": "Sample 屏幕上没有可见变化。",
+  "does": "序列的 RECALL：上一个循环中你在打击垫上演奏的内容会被添加到序列中。",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/recording_sequences.htm"
+ },
+ "SHIFT+PLAY": {
+  "screen": "CONTINUE：从停止处继续",
+  "note": "从停止时的位置继续播放（顶部绿色条不从零开始）。",
+  "does": "CONTINUE：从当前位置播放（在 Song 中，从高亮的序列开始）。",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/song_mode.htm"
+ },
+ "SHIFT+STOP": {
+  "screen": "停留在当前屏幕",
+  "note": "走带停止时没有可见变化。播放中按 SHIFT + STOP 会停止并将位置归零到开头（在 Seq 屏幕上验证）。",
+  "does": "用户指南中没有列出单独的 SHIFT + STOP 功能。",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/features.htm"
+ },
+ "SHIFT+PAD 1": {
+  "screen": "FULL LEVEL：\"Full Level Enabled\"",
+  "note": "弹出 \"Full Level: Enabled\" / \"Disabled\"：无论敲击力度如何，打击垫都以最大电平发声。",
+  "does": "FULL LEVEL：无论敲击多重，所有打击垫都以最大力度发声。",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/features.htm"
+ },
+ "SHIFT+PAD 2": {
+  "screen": "HALF SEQ：\"Seq A01 halved\"",
+  "note": "弹出 \"Half Seq: Seq A01 halved\"：序列长度减半。下方屏幕不变。",
+  "does": "HALF SEQ：序列长度减半（4 小节 → 2）。",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/editing_sequences.htm"
+ },
+ "SHIFT+PAD 3": {
+  "screen": "DOUBLE SEQ：\"Seq A01 doubled\"",
+  "note": "序列长度加倍（内容重复一遍）。在当前屏幕上弹出提示。",
+  "does": "DOUBLE SEQ：序列长度加倍，音符随之复制（4 小节 → 8）。",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/editing_sequences.htm"
+ },
+ "SHIFT+PAD 4": {
+  "screen": "COUNT-IN：录音前预备拍",
+  "note": "弹出 \"Count-In: Disabled\" / \"Enabled\"：每按一次切换预备拍。",
+  "does": "COUNT-IN：录音前有一小节预备拍（开启时 1234 图标为红色）。",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/sequence_mode.htm"
+ },
+ "SHIFT+PAD 5": {
+  "screen": "COMPRESSOR：主输出压缩器",
+  "keys": [
+   "Color 开/关（音色染色）",
+   "–",
+   "Bypass 开/关"
+  ],
+  "knobs": [
+   "Attack",
+   "Release",
+   "Amount"
+  ],
+  "note": "独立的屏幕，带有图片，右侧为电平表。Bypass 时卡通形象\"睡着\"，电平表变暗。在工程中这是主输出上的 Color Compressor 效果器。",
+  "steps": {
+   "SCREEN 1": "Color 开启",
+   "SCREEN 3": "Bypass：压缩器关闭",
+   "SHIFT+SCREEN 1": "无 Color，处于 Bypass"
+  },
+  "does": "主混音上的 COMPRESSOR，主要用于\"抽吸\"式压缩，也适合温和的峰值限制。K1 起音（0.1–150 ms），K2 释放（3–300 ms），K3 压缩量（阈值与压缩比合为一个旋钮），⇧K3 输入增益。B1 Color 加入\"磁带温暖感\"：少许低频、音高抖动、饱和。B3 旁通。",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/compressor.htm"
+ },
+ "SHIFT+PAD 6": {
+  "screen": "HALF SPEED：\"Seq A01 event speed halved\"",
+  "note": "序列事件被拉伸为两倍（播放速度慢一倍）。",
+  "does": "HALF SPEED：序列音符以一半速度播放（1/8 踩镲变为 1/4）。",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/editing_sequences.htm"
+ },
+ "SHIFT+PAD 7": {
+  "screen": "DOUBLE SPEED：\"Seq A01 event speed doubled\"",
+  "note": "序列事件被压缩为一半。",
+  "does": "DOUBLE SPEED：序列音符以两倍速度播放（1/8 → 1/16）。",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/editing_sequences.htm"
+ },
+ "SHIFT+PAD 8": {
+  "screen": "MIDI CONFIG：MIDI 设置",
+  "keys": [
+   "Back",
+   "–",
+   "–"
+  ],
+  "data": "转动选择一行，按下编辑该行",
+  "note": "各行：MIDI Port（External）、MIDI In Channel（All）、MIDI Out Channel（1）、Pad MIDI In（On）、Pad MIDI Out（Always）、MIDI Sync In（Off）、MIDI Sync Out（MIDI Clock）。右侧显示版本 v1.3.0。本实验环境中事先已开启 Pad MIDI In 和 MIDI Sync Out。",
+  "does": "MIDI CONFIG：MIDI 端口（插孔或 USB）、输入和输出通道、打击垫是否响应和发送 MIDI、同步输入和输出（MIDI Clock 或 MTC）、MIDI Thru、用 Program Change 切换序列、SYNC OUT 上的 CV 同步。还有 Takeover，即旋钮和推子如何接管数值：Pickup（等到位置一致才生效）、Scaled（逐渐追上，旋钮默认）或 Instant（立即跳变）。以及重置设置或全部数据（注意，不可恢复）。",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/midi_configuration.htm"
+ },
+ "SHIFT+PAD 9": {
+  "screen": "FADER：推子的功能",
+  "keys": [
+   "Back",
+   "–",
+   "ON（推子启用）"
+  ],
+  "data": "转动选择分配目标，按下确认",
+  "note": "推子分配：Pad Volume、Pad Pan、Pad Tune、Pad Amp Attack、Pad Amp Decay、Pad Filter Cutoff、Kit Volume…",
+  "does": "FADER，推子控制什么：打击垫音量、声像、调音、起音或衰减/释放、滤波器截止频率，或整个套件的音量。B3 开启或关闭推子。其 LED 亮度显示数值：如果推子位置与数值不一致，移动推子直到 LED 开始变化。",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/fader.htm"
+ },
+ "SHIFT+PAD 10": {
+  "screen": "REC QUANTIZE：录音时量化",
+  "note": "弹出 \"Rec Quantize: Off\" / \"On\"：切换录音时量化（与 Seq 屏幕上的 Rec Quant 相同）。",
+  "does": "REC QUANTIZE：录下的所有内容都对齐到 Q 网格。",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/editing_sequences.htm"
+ },
+ "SHIFT+PAD 11": {
+  "screen": "RESAMPLE：\"Resample Seq: Select pad\"",
+  "keys": [
+   "Cancel",
+   "–",
+   "–"
+  ],
+  "note": "将序列录成一个采样：敲击要录入的打击垫。SCREEN 1 取消。",
+  "does": "RESAMPLE：将整个序列渲染为你敲击的打击垫上的新采样。可腾出打击垫，并把节拍固化下来。",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/editing_sequences.htm"
+ },
+ "SHIFT+PAD 12": {
+  "screen": "SONG：由序列组成的歌曲",
+  "keys": [
+   "Export",
+   "Remove",
+   "Insert"
+  ],
+  "note": "歌曲屏幕；本工程中为 \"Empty Song\"。按钮：Export、Remove、Insert（遍历测试未尝试，歌曲为空）。",
+  "does": "SONG，由序列组成的歌曲：打击垫选择序列，B3 将其插入列表，滚轮或 −/+ 浏览列表，B2 删除，PLAY 从头播放歌曲。B1 导出：导出为音频文件（需命名）或工程中的新序列。",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/song_mode.htm"
+ },
+ "SHIFT+PAD 13": {
+  "screen": "TRIM SAMPLE：屏幕无变化",
+  "note": "屏幕上没有可见变化。",
+  "does": "TRIM SAMPLE：从采样中剪掉 Start 之前和 End 之后的全部内容。",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/features.htm"
+ },
+ "SHIFT+PAD 14": {
+  "screen": "TIME CORRECT：量化已演奏的内容",
+  "keys": [
+   "Cancel",
+   "All（全部打击垫）",
+   "Do It!"
+  ],
+  "knobs": [
+   "Q 1/8（网格）",
+   "Shift",
+   "Swing"
+  ],
+  "note": "打击垫 A1–A16 的网格：选择要校正的打击垫。Do It! 将序列事件移到 Q 网格上。",
+  "does": "TIME CORRECT，对齐已录制的音符。打击垫选择要处理哪些音符（B2 全部），K1 网格 Q，K2 Shift 将音符略微提前或延后以调整律动，K3 Swing 加入摇摆感。B3 Do It! 应用，⇧− 撤销。Q 和 Swing 对整个工程生效。",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/time_correct.htm"
+ },
+ "SHIFT+PAD 15": {
+  "screen": "WARP：\"Warp: Time stretch\"",
+  "note": "弹出 \"Warp: Time stretch\"（再按一次为 Pitch）。",
+  "does": "WARP：在 Time Stretch（长度和速度改变，音高不变）与 Pitch（长度和音高一起改变）之间切换 Warp 模式。Warp 数值本身是 Tune 标签页上的 K3。",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/sample_mode.htm"
+ },
+ "SHIFT+PAD 16": {
+  "screen": "PROJECT：工程",
+  "keys": [
+   "Back",
+   "–",
+   "–"
+  ],
+  "data": "转动选择一行，按下打开",
+  "note": "菜单：Load Project、Save Project、New Project、SD Card Access。Load Project 打开工程浏览器（Internal：Demos、Kits、User）。",
+  "steps": {
+   "DATA": "Load Project：Projects 浏览器（Demos、Kits、User）"
+  },
+  "does": "PROJECT：Load Project（Demos；Kits：带四个序列的套件，B3 Load Kit 仅载入音色；User）、Save Project（命名，B3 Do It!）、New Project、SD Card Access：通过 USB 让电脑识别 microSD 卡（退出前先在电脑上弹出）。MPC 也会在后台自动保存工程。",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/project.htm"
+ },
+ "SHIFT+DATA": {
+  "screen": "Sample：选框移到上一个参数",
+  "note": "SHIFT + 按下滚轮会将选框向后移（Start → Loop）；不按 SHIFT 则向前。",
+  "does": "在 Sample 页面上：将滚轮控制的参数向后切换。",
+  "guide": "https://www.akaipro.com/guides/mpc-sample/sample_mode.htm"
+ }
+}

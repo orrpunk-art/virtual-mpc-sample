@@ -1,0 +1,46 @@
+#!/bin/busybox sh
+# MPC lab initramfs.
+# The kernel's dm-init has already created /dev/dm-0 from the stock verity table
+# (dm-mod.create on the command line), so the stock rootfs is verified block by block.
+# We stack the lab layer on top as a second read-only lower dir and switch_root.
+/bin/busybox --install -s /bin
+mount -t devtmpfs devtmpfs /dev
+mount -t proc proc /proc
+mount -t sysfs sysfs /sys
+# stock boot splash until the app takes the display (kernel logo and fbcon are off)
+[ -e /dev/fb0 ] && [ -f /splash.raw ] && cat /splash.raw > /dev/fb0
+
+fail() { echo "mpclab-init: $*" >/dev/console; echo "mpclab-init: dropping to shell" >/dev/console; exec sh </dev/console >/dev/console 2>&1; }
+
+root=/dev/dm-0
+for arg in $(cat /proc/cmdline); do
+    case "$arg" in
+        root=*) root=${arg#root=} ;;
+        mpclab.shell) fail "shell requested" ;;
+    esac
+done
+
+i=0
+while [ ! -b "$root" ]; do
+    i=$((i + 1)); [ $i -gt 100 ] && fail "root $root did not appear"; sleep 0.1
+done
+
+layer=
+for b in /sys/block/vd*; do
+    [ "$(cat "$b/serial" 2>/dev/null)" = mpclab-layer ] && layer=/dev/${b##*/}
+done
+
+mkdir -p /lower /layer /newroot
+mount -t ext4 -o ro "$root" /lower || fail "cannot mount $root"
+if [ -n "$layer" ]; then
+    mount -t ext4 -o ro "$layer" /layer || fail "cannot mount lab layer $layer"
+    # only lower dirs: the merged root is read-only, as on the device
+    mount -t overlay overlay -o lowerdir=/layer:/lower /newroot || fail "overlay mount failed"
+else
+    echo "mpclab-init: no lab layer, booting the stock rootfs alone" >/dev/console
+    mount --move /lower /newroot
+fi
+
+mount --move /dev /newroot/dev
+umount /proc /sys
+exec switch_root /newroot /sbin/init
