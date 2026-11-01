@@ -599,7 +599,8 @@ def wait_app(timeout=240):
             return
         except (RuntimeError, subprocess.TimeoutExpired):
             time.sleep(3)
-    raise RuntimeError("the app did not come up")
+    raise RuntimeError("no app audio in %d s: the boot stalled, or the package stopped the app and did not start its own "
+                       "(python3 lab.py autorun --results; out/run/console.log is the guest console)" % timeout)
 
 
 def run_autorun(zip_path, reboot=True, confirm=False, log=print, label=AUTORUN_LABEL):
@@ -626,7 +627,15 @@ def run_autorun(zip_path, reboot=True, confirm=False, log=print, label=AUTORUN_L
         card_swap(AUTORUN_IMG)
         qmp("system_reset")              # power on (from shutdown or the stopped VM)
         qmp("cont")
-        wait_app()
+        try:
+            wait_app()
+        except RuntimeError:
+            # Under HVF the first boot after a power-off sometimes stalls before the runner
+            # starts (CPU 0 stops answering: "rcu_preempt detected stalls" in out/run/console.log,
+            # the splash stays, nothing on the card). A second reset has always booted cleanly.
+            log("no app after 4 min: the boot stalled (known HVF issue), resetting once more")
+            qmp("system_reset")
+            wait_app()
         log(f"MPC is up with the card in: /media/{label}")
     else:
         card_swap(AUTORUN_IMG)
@@ -635,6 +644,10 @@ def run_autorun(zip_path, reboot=True, confirm=False, log=print, label=AUTORUN_L
         time.sleep(6)
         press("SCREEN 1")
         log("confirmed (left button above the screen)")
+    time.sleep(5)                        # the runner logs within seconds of the mount
+    runner = [l for l in guest("journalctl -b --no-pager -o short-monotonic 2>/dev/null | grep -iE 'run script|script-runner|autorun'; true").decode(errors="replace").splitlines() if l.strip()]
+    log("script runner: " + ("\n".join(runner[-6:]) if runner else
+        "nothing logged; the runner did not pick the package up (it needs autorun/autorun.json, autorun.check and a card it can mount)"))
 
 
 def autorun_results():

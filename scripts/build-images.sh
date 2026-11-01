@@ -18,8 +18,10 @@ mkdir -p "$OUT/keys"
 # --- lab layer ----------------------------------------------------------------
 STAGE=/tmp/layer
 rm -rf "$STAGE"; cp -a /lab/overlay/lab-layer "$STAGE"
-install -m 600 "$OUT/keys/host_ed25519" "$STAGE/etc/ssh/mpclab_host_ed25519_key"
-install -m 600 "$OUT/keys/id_ed25519.pub" "$STAGE/root/.ssh/authorized_keys"
+# -D: git keeps no empty directories, so a fresh clone has no root/.ssh or lab/ (mount point)
+install -D -m 600 "$OUT/keys/host_ed25519" "$STAGE/etc/ssh/mpclab_host_ed25519_key"
+install -D -m 600 "$OUT/keys/id_ed25519.pub" "$STAGE/root/.ssh/authorized_keys"
+mkdir -p "$STAGE/lab"
 install -D -m 755 "$OUT/bridge/mpclab-audio-bridge" "$STAGE/opt/mpclab/bin/mpclab-audio-bridge"
 chmod 700 "$STAGE/root/.ssh"
 # USB gadget: the stock scheme without its UAC2 function, which cannot bind on the lab's

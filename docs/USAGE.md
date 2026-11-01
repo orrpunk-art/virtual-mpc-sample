@@ -141,9 +141,18 @@ Packages whose `autorun/autorun.json` has `"askQuestion": false` (root SSH does)
 silently. The card stays in across POWER off/on on the rear panel, so such a package starts
 again at every power-on until the card is ejected, like a card left in the device.
 
-`--results` shows the script runner's lines of this boot, the card's files and the tail of
-the logs scripts leave (`autorun/*.txt`, `/run/*/events.txt`). The label has no space:
-some loaders refuse a card mounted at `/media/MPC SAMPLE` (the device's own card label).
+When the MPC is up, the lab prints the script runner's lines of this boot: `run script
+...` means the runner picked the package up; "nothing logged" means it did not (it needs
+`autorun/autorun.json`, a matching `autorun.check` and a card it can mount).
+`--results` shows the same lines, the card's files and the tail of the logs scripts leave
+(`autorun/*.txt`, `/run/*/events.txt`). The label has no space: some loaders refuse a card
+mounted at `/media/MPC SAMPLE` (the device's own card label).
+
+If nothing seems to happen: the first boot after the power-off sometimes stalls under HVF
+(the splash stays, `rcu_preempt detected stalls` in `out/run/console.log`, nothing on the
+card); the lab resets once more by itself after 4 min. A package that stops the stock app
+and does not start its own leaves the screen dark: `--results` then shows what its script
+logged, and `python3 lab.py ssh journalctl -b` the rest.
 
 Tested 2026-10-27 (firmware 1.3.0.12) with community packages:
 
