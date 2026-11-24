@@ -29,7 +29,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.join(HERE, ".."))
 import lab  # noqa: E402
 from lab import HOST, PORTS  # noqa: E402
-RUN = os.path.join(HERE, "..", "out", "run")
+RUN = lab.RUN
 CONTROLS = os.path.join(HERE, "controls.json")
 
 # Reply to F0 7E xx 06 01 F7, in the layout az0x-firmware-tool parses:

@@ -6,7 +6,7 @@
     python3 lab.py panel              # virtual MPC Sample at http://127.0.0.1:8765/
     python3 lab.py ssh [command...]   # root shell in the VM
     python3 lab.py preload LIB.so | --off
-    python3 lab.py autorun PACKAGE.zip [--no-reboot] [--yes] [--device-label] | --results
+    python3 lab.py autorun PACKAGE.zip [--no-reboot] [--yes] [--device-label | --label LABEL] | --results
     python3 lab.py stop | reset | status
 
 Host requirements: Python 3.9+, QEMU 9+ (qemu-system-aarch64, qemu-img), OpenSSH, and
@@ -27,13 +27,18 @@ import time
 import urllib.request
 
 LAB = os.path.dirname(os.path.abspath(__file__))
-OUT = os.path.join(LAB, "out")
+FIRMWARE = os.environ.get("MPC_FIRMWARE") or "1.3.0.12"
+if FIRMWARE not in ("1.3.0.12", "1.4.0.8"):
+    sys.exit(f"lab: unsupported MPC_FIRMWARE {FIRMWARE!r}")
+OUT_ROOT = os.path.join(LAB, "out")
+LEGACY = FIRMWARE == "1.3.0.12"
+OUT = OUT_ROOT if LEGACY else os.path.join(OUT_ROOT, FIRMWARE)
 RUN = os.path.join(OUT, "run")
-SHARE = os.path.join(LAB, "share")
-SDCARD = os.path.join(LAB, "sdcard")            # host folder that becomes the SD card
+SHARE = os.path.join(LAB if LEGACY else OUT, "share")
+SDCARD = os.path.join(LAB if LEGACY else OUT, "sdcard")
 SD_IMG = os.path.join(RUN, "sdcard.img")
 SD_SIZE = 512 << 20                             # QEMU's sd-card wants a power-of-two size
-FW_DIR = os.environ.get("FW_DIR", os.path.join(LAB, "firmware"))   # extracted firmware, never committed
+FW_DIR = os.path.abspath(os.environ.get("FW_DIR") or os.path.join(LAB, "firmware", "" if LEGACY else FIRMWARE))
 CONTENT_DIR = os.environ.get("CONTENT_DIR", os.path.join(FW_DIR, "content"))   # factory library copy
 IMAGE = "mpclab-tools"
 HOST = "127.0.0.1"
@@ -139,7 +144,10 @@ def wait_closed(port, seconds):
 
 
 def docker(*args, mounts=()):
-    cmd = ["docker", "run", "--rm", "-v", "mpclab-build:/build", "-v", f"{LAB}:/lab"]
+    container_out = "/lab/" + os.path.relpath(OUT, LAB).replace(os.sep, "/")
+    container_share = "/lab/" + os.path.relpath(SHARE, LAB).replace(os.sep, "/")
+    cmd = ["docker", "run", "--rm", "-v", "mpclab-build:/build", "-v", f"{LAB}:/lab",
+           "-e", f"MPCLAB_OUT={container_out}", "-e", f"MPCLAB_SHARE={container_share}"]
     for src, dst in mounts:
         cmd += ["-v", f"{src}:{dst}:ro"]
     subprocess.run(cmd + [IMAGE, *args], check=True)
@@ -290,12 +298,31 @@ def accel_choice(want):
     return "tcg"   # x86 hosts (Windows, Intel Mac, x86 Linux): software emulation of the A55
 
 
+def virtual_boot_args(stock):
+    """Keep the original root digest and salt while mapping eMMC to virtio."""
+    stock = stock.strip().replace("/dev/mmcblk0p", "/dev/vda")
+    if "dm-mod.create=" in stock:
+        return stock
+    table = re.fullmatch(
+        r'(.*?)\s+-- --table="(1 /dev/vda10 /dev/vda10 (1024|2048|4096) (?:1024|2048|4096) '
+        r'([1-9][0-9]*) [1-9][0-9]* sha256 [a-f0-9]{64} [a-f0-9]{64})"', stock)
+    if table is None:
+        raise ValueError("unrecognized stock dm-verity table")
+    prefix, verity, block_size, blocks = table.groups()
+    sectors = int(block_size) * int(blocks) // 512
+    return (f'{prefix} root=/dev/dm-0 rootwait=5 dm-mod.waitfor=/dev/vda10 '
+            f'dm-mod.create="rootfs,,,ro,0 {sectors} verity {verity}"')
+
+
 def cmd_run(a):
     if port_open(PORTS["qmp"]):
         die("the lab VM is already running (stop it first: python3 lab.py stop)")
-    for f in ("kernel/Image", "initramfs.cpio.gz", "emmc.base.qcow2", "lab-layer.ext4", "fw/cmdline.txt"):
+    for f in ("initramfs.cpio.gz", "emmc.base.qcow2", "lab-layer.ext4", "fw/cmdline.txt"):
         if not os.path.exists(os.path.join(OUT, f)):
-            die(f"missing out/{f}: run `python3 lab.py build` first")
+            die(f"missing {os.path.join(OUT, f)}: run `python3 lab.py build` first")
+    kernel = os.path.join(OUT_ROOT, "kernel", "Image")
+    if not os.path.isfile(kernel):
+        die("missing virtual kernel: run `python3 lab.py build kernel` first")
     os.makedirs(RUN, exist_ok=True)
     os.makedirs(SHARE, exist_ok=True)
     qemu, qimg = tool("qemu-system-aarch64"), tool("qemu-img")
@@ -322,7 +349,7 @@ def cmd_run(a):
     # nohz=off: tickless idle made HVF wake idle vCPUs 15-30 ms late for every disk read
     # (cold project load 42-46 s -> 23 s); costs ~15% of one host core while idle.
     with open(os.path.join(OUT, "fw", "cmdline.txt")) as f:
-        args = f.read().strip().replace("/dev/mmcblk0p", "/dev/vda") + " console=hvc0 vt.global_cursor_default=0 systemd.mask=getty@tty1.service nohz=off " + BUFFER + " " + a.extra
+        args = virtual_boot_args(f.read()) + " console=hvc0 vt.global_cursor_default=0 systemd.mask=getty@tty1.service nohz=off " + BUFFER + " " + a.extra
 
     emmc = os.path.join(RUN, "emmc.qcow2")
     if not os.path.exists(emmc):
@@ -339,7 +366,7 @@ def cmd_run(a):
         return f"socket,id={name},host={HOST},port={port},server=on,wait=off{extra}"
 
     cmd = [qemu, *machine,
-           "-kernel", os.path.join(OUT, "kernel", "Image"), "-initrd", os.path.join(OUT, "initramfs.cpio.gz"),
+           "-kernel", kernel, "-initrd", os.path.join(OUT, "initramfs.cpio.gz"),
            "-dtb", dtb, "-append", args,
            "-drive", f"if=none,id=emmc,file={qarg(emmc)},format=qcow2", "-device", "virtio-blk-pci,drive=emmc,serial=mpclab-emmc",
            "-drive", f"if=none,id=layer,file={qarg(os.path.join(OUT, 'lab-layer.ext4'))},format=raw,readonly=on",
@@ -486,8 +513,8 @@ DEVICE_LABEL = "MPC SAMPLE"             # how the device formats a card: /media/
 LITTER = ("__MACOSX", ".DS_Store")
 
 
-def unpack_autorun(zip_path, dest=AUTORUN_DIR):
-    """Checked extraction; returns the card root, the folder that holds autorun/autorun.json."""
+def unpack_autorun(zip_path, dest=AUTORUN_DIR, *, legacy=LEGACY):
+    """Checked extraction; returns the card root containing a supported entry point."""
     import zipfile
     shutil.rmtree(dest, ignore_errors=True)
     os.makedirs(dest)
@@ -509,16 +536,24 @@ def unpack_autorun(zip_path, dest=AUTORUN_DIR):
             os.makedirs(os.path.dirname(target), exist_ok=True)
             with z.open(info) as src, open(target, "wb") as out:
                 shutil.copyfileobj(src, out)
-    if os.path.isfile(os.path.join(dest, "autorun.json")):          # zipped the folder's contents
+    if legacy and os.path.isfile(os.path.join(dest, "autorun.json")):    # zipped the folder's contents
         inner = os.path.join(dest, "autorun")
         os.makedirs(inner)
         for n in os.listdir(dest):
             if n != "autorun":
                 shutil.move(os.path.join(dest, n), inner)
-    for root in [dest] + sorted(os.path.join(dest, d) for d in os.listdir(dest)):
-        if os.path.isfile(os.path.join(root, "autorun", "autorun.json")):
+    folders = sorted(entry.path for entry in os.scandir(dest) if entry.is_dir())
+    for root in [dest] + folders:
+        autorun = os.path.join(root, "autorun")
+        if legacy and os.path.isfile(os.path.join(autorun, "autorun.json")):
             return root
-    raise ValueError("no autorun/autorun.json in the zip")
+        if not legacy and (os.path.isfile(os.path.join(root, "autorun.sh")) or
+                           (os.path.isdir(autorun) and any(
+                               entry.name.endswith(".scriptpkg") and entry.is_file()
+                               for entry in os.scandir(autorun)))):
+            return root
+    entry_point = "autorun/autorun.json" if legacy else "autorun.sh or autorun/*.scriptpkg"
+    raise ValueError(f"{FIRMWARE} requires {entry_point} at the card root")
 
 
 def guest(command, data=None, timeout=300):
@@ -612,7 +647,7 @@ def run_autorun(zip_path, reboot=True, confirm=False, log=print, label=AUTORUN_L
         power_button()
         wait_app()
     files = sum(len(fs) for _, _, fs in os.walk(root))
-    log(f"package: {files} files, autorun/: {', '.join(sorted(os.listdir(os.path.join(root, 'autorun'))))}")
+    log(f"package: {files} files, card root: {', '.join(sorted(os.listdir(root)))}")
     log("building an exFAT card with the firmware's fdisk/mkfs.exfat in the VM")
     size = make_autorun_card(root, label)
     log(f"card ready: {size >> 20} MiB, label {label}")
@@ -646,14 +681,21 @@ def run_autorun(zip_path, reboot=True, confirm=False, log=print, label=AUTORUN_L
         log("confirmed (left button above the screen)")
     time.sleep(5)                        # the runner logs within seconds of the mount
     runner = [l for l in guest("journalctl -b --no-pager -o short-monotonic 2>/dev/null | grep -iE 'run script|script-runner|autorun'; true").decode(errors="replace").splitlines() if l.strip()]
-    log("script runner: " + ("\n".join(runner[-6:]) if runner else
-        "nothing logged; the runner did not pick the package up (it needs autorun/autorun.json, autorun.check and a card it can mount)"))
+    if not runner:
+        requirements = ("a mountable card and a valid autorun/autorun.check" if LEGACY else
+                        "a mountable card and a signed script package or Developer Mode with autorun.sh")
+        runner.append(f"nothing logged; check for {requirements}")
+    log("script runner: " + "\n".join(runner[-6:]))
 
 
 def autorun_results():
     """Script runner lines of this boot, the card's files and the tail of logs scripts leave."""
     return guest("""journalctl -b --no-pager -o short-monotonic 2>/dev/null | grep -iE 'run script|script-runner|autorun' | tail -n 15
-for m in /media/*/; do [ -d "$m/autorun" ] || continue; echo; echo "== $m"; ls -la "$m" "$m/autorun" 2>&1; done
+for m in /media/*/; do
+    [ -d "$m/autorun" ] || [ -f "$m/autorun.sh" ] || continue
+    echo; echo "== $m"; ls -la "$m"
+    if [ -d "$m/autorun" ]; then ls -la "$m/autorun"; fi
+done
 for f in /media/*/autorun/*.txt /media/*/*.txt /run/*/events.txt /run/*/*.log; do [ -f "$f" ] && {{ echo; echo "== $f"; tail -n 25 "$f"; }; done; true""",
                  timeout=60).decode(errors="replace")
 
@@ -663,9 +705,9 @@ def cmd_autorun(a):
         print(autorun_results())
         return
     if not a.zip:
-        die("usage: lab.py autorun PACKAGE.zip [--no-reboot] [--yes] [--device-label] | --results")
+        die("usage: lab.py autorun PACKAGE.zip [--no-reboot] [--yes] [--device-label | --label LABEL] | --results")
     run_autorun(a.zip, reboot=not a.no_reboot, confirm=a.yes, log=lambda m: print("lab:", m),
-                label=DEVICE_LABEL if a.device_label else AUTORUN_LABEL)
+                label=DEVICE_LABEL if a.device_label else a.label or AUTORUN_LABEL)
 
 
 def cmd_panel(a):
@@ -674,8 +716,10 @@ def cmd_panel(a):
 
 # ----------------------------------------------------------------------------- build (Docker)
 def cmd_build(a):
-    subprocess.run(["docker", "build", "-q", "-t", IMAGE, os.path.join(LAB, "docker")], check=True)
     steps = a.steps or ["kernel", "bridge", "images", "content"]
+    if any(step in steps for step in ("images", "content")) and port_open(PORTS["qmp"]):
+        die("stop the VM before building disk images")
+    subprocess.run(["docker", "build", "-q", "-t", IMAGE, os.path.join(LAB, "docker")], check=True)
     if "kernel" in steps:
         docker("sh", "/lab/scripts/build-kernel.sh")
     if "bridge" in steps:
@@ -683,38 +727,88 @@ def cmd_build(a):
     if "tools" in steps:
         docker("sh", "/lab/scripts/build-strace.sh")
     if "images" in steps:
-        fw = {"rootfs.ext4": "extracted/part2", "boot.ext2": "extracted/part1", "recovery.ext2": "extracted/parr"}
-        for src in fw.values():
-            if not os.path.exists(os.path.join(FW_DIR, src)):
-                die(f"firmware input {src} not found in FW_DIR={FW_DIR}")
+        if LEGACY:
+            fw = {"rootfs.ext4": "extracted/part2", "boot.ext2": "extracted/part1", "recovery.ext2": "extracted/parr"}
+        else:
+            fw = {"rootfs.ext4": "extracted/03-rootfs.img", "boot.ext2": "extracted/02-boot.img",
+                  "recovery.ext2": "extracted/01-recovery.img"}
         verify_inputs()
         docker("sh", "/lab/scripts/build-images.sh", mounts=[(os.path.join(FW_DIR, v), "/fw/" + k) for k, v in fw.items()])
     if "content" in steps:
         if not os.path.isdir(CONTENT_DIR):
             print(f"lab: no factory library at CONTENT_DIR={CONTENT_DIR}: /content stays empty (README: Factory library)")
-        elif port_open(PORTS["qmp"]):
-            die("stop the VM first (python3 lab.py stop): the content step rewrites the eMMC base image")
         else:
             docker("sh", "/lab/scripts/build-content.sh", mounts=[(CONTENT_DIR, "/content")])
 
 
 def verify_inputs():
     import hashlib
-    with open(os.path.join(LAB, "inputs.sha256")) as f:
+    manifest = "inputs.sha256" if LEGACY else f"inputs-{FIRMWARE}.sha256"
+    update = f"MPCSAMPLE-{FIRMWARE}-update.img"
+    with open(os.path.join(LAB, manifest)) as f:
+        inputs = {}
         for line in f:
             digest, rel = line.split(None, 1)
-            rel = rel.strip()
-            h = hashlib.sha256()
-            with open(os.path.join(FW_DIR, rel), "rb") as g:
-                for chunk in iter(lambda: g.read(1 << 20), b""):
-                    h.update(chunk)
+            inputs[rel.strip()] = digest
+    for rel, digest in inputs.items():
+        path = os.path.join(FW_DIR, rel)
+        if not os.path.isfile(path):
+            die(f"firmware input {rel} not found in FW_DIR={FW_DIR}")
+        h = hashlib.sha256()
+        with open(path, "rb") as source:
+            for chunk in iter(lambda: source.read(1 << 20), b""):
+                h.update(chunk)
             if h.hexdigest() != digest:
                 die(f"{rel}: SHA-256 mismatch")
             print(f"{rel}: OK")
+            if not LEGACY and rel == update:
+                for partition in inputs:
+                    if partition.startswith("extracted/") and not os.path.exists(os.path.join(FW_DIR, partition)):
+                        extract_partition(source, partition)
+
+
+def extract_partition(source, partition):
+    import lzma
+    import tempfile
+
+    # This runs only after the complete stock AZ0x update has passed its pinned hash.
+    source.seek(0x18)
+    table, = struct.unpack("<I", source.read(4))
+    index = int(os.path.basename(partition).split("-", 1)[0])
+    source.seek(table + index * 0x40 + 8)
+    offset, remaining = struct.unpack("<QQ", source.read(16))
+    source.seek(offset)
+    path = os.path.join(FW_DIR, partition)
+    directory = os.path.dirname(path)
+    os.makedirs(directory, exist_ok=True)
+    # Stage the compressed partition to keep host memory independent of its size.
+    with tempfile.TemporaryFile() as compressed, tempfile.TemporaryDirectory(dir=directory) as work:
+        while remaining:
+            chunk = source.read(min(remaining, 1 << 20))
+            if not chunk:
+                die(f"{partition}: truncated AZ0x payload")
+            compressed.write(chunk)
+            remaining -= len(chunk)
+        compressed.seek(0)
+        staged = os.path.join(work, "partition.img")
+        with lzma.open(compressed, "rb") as payload, open(staged, "wb") as target:
+            shutil.copyfileobj(payload, target)
+        os.replace(staged, path)
 
 
 # ----------------------------------------------------------------------------- self-test
 def selftest():
+    legacy = 'ro dm-mod.create="rootfs,,,ro,0 8 verity 1 /dev/mmcblk0p10 /dev/mmcblk0p10"'
+    assert virtual_boot_args(legacy) == legacy.replace("mmcblk0p", "vda")
+    digest, salt = "a" * 64, "b" * 64
+    signed_table = f'1 /dev/mmcblk0p10 /dev/mmcblk0p10 1024 1024 569680 569680 sha256 {digest} {salt}'
+    args = virtual_boot_args(f'ro -- --table="{signed_table}"')
+    assert f'0 1139360 verity {signed_table.replace("mmcblk0p", "vda")}' in args
+    try:
+        virtual_boot_args("ro -- --table=incomplete")
+        raise AssertionError("invalid verity table accepted")
+    except ValueError:
+        pass
     # build a small tree, write it, read it back, patch-like edits survive
     root = Node("")
     root.props["compatible"] = s("linux,dummy-virt")
@@ -752,9 +846,16 @@ def selftest():
             with zipfile.ZipFile(zp, "w") as z:
                 for n, data in layout.items():
                     z.writestr(n, data)
-            root = unpack_autorun(zp, os.path.join(d, "out"))
+            root = unpack_autorun(zp, os.path.join(d, "out"), legacy=True)
             assert os.path.isfile(os.path.join(root, "autorun", "autorun.json")), layout
             assert not os.path.exists(os.path.join(d, "out", "__MACOSX"))
+        for layout, entry in (({"autorun.sh": b"x"}, "autorun.sh"),
+                              ({"pkg/autorun/example.scriptpkg": b"x"}, "autorun/example.scriptpkg")):
+            with zipfile.ZipFile(zp, "w") as z:
+                for n, data in layout.items():
+                    z.writestr(n, data)
+            root = unpack_autorun(zp, os.path.join(d, "out"), legacy=False)
+            assert os.path.isfile(os.path.join(root, entry)), layout
         with zipfile.ZipFile(zp, "w") as z:
             z.writestr("../evil", b"x")
         try:
@@ -781,8 +882,10 @@ def main():
     ar.add_argument("zip", nargs="?")
     ar.add_argument("--no-reboot", action="store_true", help="insert the card without restarting the MPC first")
     ar.add_argument("--yes", action="store_true", help="also confirm the script's question")
-    ar.add_argument("--device-label", action="store_true",
-                    help=f"label the card '{DEVICE_LABEL}' like the device does (mounted with a space in the path)")
+    labels = ar.add_mutually_exclusive_group()
+    labels.add_argument("--device-label", action="store_true",
+                        help=f"label the card '{DEVICE_LABEL}' like the device does (mounted with a space in the path)")
+    labels.add_argument("--label", help="label for the virtual exFAT card")
     ar.add_argument("--results", action="store_true", help="show script runner lines, card files and script logs")
     for n in ("panel", "stop", "reset", "status", "selftest"):
         sub.add_parser(n)

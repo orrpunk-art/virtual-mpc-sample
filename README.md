@@ -7,6 +7,9 @@ whole device in your browser: the top panel with the live screen, pads, knobs an
 the rear panel with its jacks, the SD slot and USB-C. Works on macOS, Linux and Windows;
 fastest on Apple Silicon.
 
+The optional [1.4.0.8 profile](#firmware-1408) boots the same stock userspace build found
+on the physical MPC Sample with the virtual kernel and the original verified root filesystem.
+
 ![Virtual MPC Sample: rear panel with jacks on top, the device below, the rack of virtual
 devices on the right](docs/img/panel.jpg)
 
@@ -45,7 +48,7 @@ page (open `stock-map/index.html`).
   packages.
 - Power key as on the device: the app asks, saves the project, powers off.
 
-Not yet: USB audio over USB-C, a Windows test run, other firmware versions. See the
+Not yet: USB audio over USB-C and a Windows test run. See the
 [roadmap](#roadmap).
 
 ## Quick start
@@ -77,6 +80,28 @@ python3 lab.py reset             # next start from a clean eMMC
 On Windows use `py lab.py ...`. On macOS start the lab from Terminal.app or iTerm, not from
 an IDE's or another app's terminal pane: macOS may throttle it, and the sound clicks.
 
+## Firmware 1.4.0.8
+
+1. Get `MPCSAMPLE-1.4.0.8-update.img` via the [Akai updater manifest](https://imb-web-az0x-updates.s3.amazonaws.com/mpc-sample/mpc-sample.version.json).
+2. Save the image under `firmware/1.4.0.8/` or set `FW_DIR` to its directory. The build checks the image against its pinned SHA-256, extracts any missing partitions and verifies their hashes.
+3. Stop any running VM and use the same firmware selection for every lab command.
+
+```bash
+export MPC_FIRMWARE=1.4.0.8
+python3 lab.py build bridge images   # also run 'build kernel' on a fresh checkout
+python3 lab.py run --headless
+```
+
+In PowerShell, use `$env:MPC_FIRMWARE = '1.4.0.8'`. The profile uses disk images,
+keys, SD data and logs under `out/1.4.0.8`. The two profiles share the virtual
+kernel and ports. To return to 1.3.0.12, stop 1.4.0.8 and unset `MPC_FIRMWARE`.
+
+The profile preserves the dm-verity root hash from Akai's FIT. It uses QEMU's
+virtual display, MIDI and ALSA loopback under the lab kernel. Use physical
+hardware to test Akai's 6.18 kernel, LoadPin policy, USB Audio or round-trip latency.
+For a developer autorun, enable Developer Mode in the virtual MPC's MIDI Config
+and package `autorun.sh` at the SD root.
+
 ## Documentation
 
 | | |
@@ -101,8 +126,7 @@ an IDE's or another app's terminal pane: macOS may throttle it, and the sound cl
 
 Help is welcome on any of these:
 
-- **Firmware extractor** for the `AZ0x` update image, so that setup is one command. The
-  biggest barrier for new users today.
+- **Firmware extractor for 1.3.0.12** to simplify setup of the legacy profile.
 - **Windows and Linux runs.** The code paths exist; only macOS (Apple Silicon) has been run.
 - **Prebuilt kernel and audio bridge** as release downloads, so no 15-minute Docker build.
 - **CI** running `make test` (the lab and panel self-tests) on every pull request.

@@ -18,10 +18,9 @@ import time
 sys.path.insert(0, os.path.dirname(__file__))
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
 import qmp  # noqa: E402
-from lab import HOST, PORTS  # noqa: E402
+from lab import HOST, OUT, PORTS  # noqa: E402
 
-LAB = os.path.join(os.path.dirname(__file__), "..")
-SHOTS = os.path.join(LAB, "out", "shots")
+SHOTS = os.path.join(OUT, "shots")
 
 
 def shot(name):

@@ -1,7 +1,7 @@
 # Convenience wrapper for macOS/Linux. Everything lives in lab.py, which also runs on
-# Windows (py lab.py ...). Firmware stays in $(FW_DIR) and is only mounted read-only.
-FW_DIR ?= $(CURDIR)/firmware
-LAB := FW_DIR=$(FW_DIR) python3 lab.py
+# Windows (py lab.py ...). lab.py selects the default firmware directory.
+export FW_DIR MPC_FIRMWARE
+LAB := python3 lab.py
 
 .PHONY: build kernel bridge tools images run run-headless panel ssh stop reset status test
 

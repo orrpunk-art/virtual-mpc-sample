@@ -8,7 +8,7 @@
 #   initramfs.cpio.gz  lab initramfs
 #   keys/              lab ssh keys (never committed)
 set -eu
-OUT=/lab/out
+OUT=${MPCLAB_OUT:-/lab/out}
 mkdir -p "$OUT/keys"
 
 # --- ssh keys -----------------------------------------------------------------
@@ -54,7 +54,7 @@ debugfs -R "dump /kernel.fit $OUT/fw/kernel.fit" /fw/boot.ext2 2>/dev/null
 # the stock command line (dm-verity table + root hash) lives in the FIT's fdt-cmdline overlay
 dumpimage -T flat_dt -p 3 -o /tmp/fdt-cmdline.dtb "$OUT/fw/kernel.fit" >/dev/null
 fdtget -t s /tmp/fdt-cmdline.dtb /fragment@0/__overlay__ bootargs > "$OUT/fw/cmdline.txt"
-grep -q 'verity' "$OUT/fw/cmdline.txt"
+grep -Eq 'dm-mod.create=|--table=' "$OUT/fw/cmdline.txt"
 
 # --- eMMC ---------------------------------------------------------------------
 # Layout and GUIDs from the update image's inmusic,partitions property.

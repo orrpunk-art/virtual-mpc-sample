@@ -15,9 +15,7 @@ import sys
 import uuid
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
-from lab import HOST, PORTS  # noqa: E402
-
-RUN = os.path.join(os.path.dirname(__file__), "..", "out", "run")
+from lab import HOST, PORTS, RUN  # noqa: E402
 
 
 def main():

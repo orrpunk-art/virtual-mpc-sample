@@ -38,9 +38,11 @@ Windows；在 Apple Silicon 上速度最快。
 - USB-C：设备自带的 USB 网络（192.168.155.1）、USB MIDI、供社区包使用的 root SSH。
 - 电源键与真机一致：应用询问、保存工程、关机。
 
-尚未实现：通过 USB-C 的 USB 音频、Windows 上的实测、其他固件版本。见[路线图](#路线图)。
+尚未实现：通过 USB-C 的 USB 音频、Windows 上的实测。见[路线图](#路线图)。
 
 ## 快速开始
+
+使用 1.4.0.8 固件时，请参阅[独立配置说明](README.md#firmware-1408)。
 
 需要 QEMU 9+、Docker（仅构建时需要）、Python 3.9+ 和 OpenSSH 客户端。
 
@@ -94,7 +96,7 @@ Windows 上使用 `py lab.py ...`。macOS 上请从 Terminal.app 或 iTerm 启�
 
 以下任何一项都欢迎贡献：
 
-- **固件解包工具**，用于 `AZ0x` 更新镜像，让配置只需一条命令。这是目前新用户面临的最大障碍。
+- **1.3.0.12 固件解包工具**，简化旧版固件的配置。
 - **在 Windows 和 Linux 上运行。** 相关代码已存在，但只在 macOS（Apple Silicon）上实际运行过。
 - **预编译的内核和音频桥** 作为 release 下载，省去 15 分钟的 Docker 构建。
 - **CI**：在每个 pull request 上运行 `make test`（实验室和面板的自检）。

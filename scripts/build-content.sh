@@ -7,7 +7,7 @@
 # The factory library is not part of the firmware update; README.md says how to copy it
 # from your own MPC Sample.
 set -eu
-BASE=/lab/out/emmc.base.qcow2
+BASE=${MPCLAB_OUT:-/lab/out}/emmc.base.qcow2
 IMG=/tmp/emmc.raw
 [ -f "$BASE" ] || { echo "no $BASE: run \`lab.py build images\` first" >&2; exit 1; }
 [ -d /content/Samples ] || [ -d /content/Projects ] || { echo "/content has no Samples/ or Projects/" >&2; exit 1; }
