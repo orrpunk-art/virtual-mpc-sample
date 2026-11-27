@@ -56,11 +56,12 @@ Not yet: USB audio over USB-C and a Windows test run. See the
 You need QEMU 9+, Docker (only for the build), Python 3.9+ and an OpenSSH client.
 
 1. Clone the repository.
-2. Put the firmware partitions in `firmware/extracted/` (git-ignored):
-   `part1` (boot), `part2` (rootfs), `parr` (recovery), extracted from inMusic's
-   `MPCSAMPLE-1.3.0.12-update.img`. The build checks them against `inputs.sha256`.
-   This repository has no extractor for the update image yet
-   ([details](docs/CUSTOM_FIRMWARE.md#4-another-stock-firmware-version)).
+2. Save inMusic's `MPCSAMPLE-1.3.0.12-update.img` as
+   `firmware/Firmware/MPCSAMPLE-1.3.0.12-update.img` (git-ignored). In the macOS updater
+   it is `Contents/Resources/Update.img`. The build checks it against `inputs.sha256`,
+   extracts the partitions it needs into `firmware/extracted/` (`part1` boot, `part2`
+   rootfs, `parr` recovery) and checks them too. Partitions you extracted yourself are
+   used as they are.
 3. Build and run:
 
    ```bash
@@ -126,7 +127,6 @@ and package `autorun.sh` at the SD root.
 
 Help is welcome on any of these:
 
-- **Firmware extractor for 1.3.0.12** to simplify setup of the legacy profile.
 - **Windows and Linux runs.** The code paths exist; only macOS (Apple Silicon) has been run.
 - **Prebuilt kernel and audio bridge** as release downloads, so no 15-minute Docker build.
 - **CI** running `make test` (the lab and panel self-tests) on every pull request.

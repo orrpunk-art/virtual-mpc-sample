@@ -140,7 +140,10 @@ still needs a way onto the device, such as an autorun package (1).
    $FW_DIR/extracted/parr    recovery partition (ext2)
    ```
 
-   The update image is an `AZ0x` container. This repository has no extractor for it.
+   The update image is an `AZ0x` container. Once the image has passed its SHA-256 in the
+   manifest, `lab.py build images` extracts any partition the manifest names that is
+   missing (`az0x_sections()` and `extract_partition()` in `lab.py`), as it does for
+   1.3.0.12 and 1.4.0.8.
 3. Write the new SHA-256 values into `inputs.sha256`, so that `build` checks them:
 
    ```bash
