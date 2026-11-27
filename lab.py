@@ -147,7 +147,8 @@ def docker(*args, mounts=()):
     container_out = "/lab/" + os.path.relpath(OUT, LAB).replace(os.sep, "/")
     container_share = "/lab/" + os.path.relpath(SHARE, LAB).replace(os.sep, "/")
     cmd = ["docker", "run", "--rm", "-v", "mpclab-build:/build", "-v", f"{LAB}:/lab",
-           "-e", f"MPCLAB_OUT={container_out}", "-e", f"MPCLAB_SHARE={container_share}"]
+           "-e", f"MPCLAB_OUT={container_out}", "-e", f"MPCLAB_SHARE={container_share}",
+           "-e", "REBUILD_EMMC"]
     for src, dst in mounts:
         cmd += ["-v", f"{src}:{dst}:ro"]
     subprocess.run(cmd + [IMAGE, *args], check=True)
