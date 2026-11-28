@@ -68,6 +68,27 @@ pane.** Measured 2026-10-27: QEMU started from the Claude desktop app's terminal
 its threads dropped to priority 4 (background) for seconds at a time, and the guest then woke
 1-30 ms late on 75 % of timer ticks; started from Terminal.app, 99.8 % were on time.
 
+### Rebuild the virtual eMMC
+
+`python3 lab.py build images` verifies the firmware inputs, builds the lab images and
+reuses an existing `emmc.base.qcow2` for the selected profile. To recreate that base
+image on macOS or Linux, stop the VM and run the command below.
+
+```bash
+REBUILD_EMMC=1 python3 lab.py build images
+```
+
+In PowerShell, set `$env:REBUILD_EMMC = '1'` before running `py lab.py build images`,
+then clear it with `Remove-Item Env:REBUILD_EMMC`.
+
+To preserve the old VM disk, back up `emmc.base.qcow2` and its `run/emmc.qcow2`
+together before rebuilding. The new base starts with an empty `/content`. If you imported
+the factory library, restore it with `python3 lab.py build content`.
+
+After changing a profile's firmware inputs and rebuilding its base, use `python3 lab.py reset`
+to start with a clean working disk on the new base. `reset` deletes the working disk,
+including any projects and settings in `/data`.
+
 ### Factory library (stock content)
 
 The factory library is not in this repository and not in the firmware update. Take it from

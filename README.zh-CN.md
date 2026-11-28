@@ -47,10 +47,10 @@ Windows；在 Apple Silicon 上速度最快。
 需要 QEMU 9+、Docker（仅构建时需要）、Python 3.9+ 和 OpenSSH 客户端。
 
 1. 克隆本仓库。
-2. 将固件分区放入 `firmware/extracted/`（已被 git 忽略）：`part1`（boot）、`part2`（rootfs）、
-   `parr`（recovery），均提取自 inMusic 的 `MPCSAMPLE-1.3.0.12-update.img`。构建时会用
-   `inputs.sha256` 校验。本仓库暂时没有更新镜像的解包工具
-   （[详情](docs/CUSTOM_FIRMWARE.md#4-another-stock-firmware-version)）。
+2. 将 inMusic 的固件更新镜像保存为 `firmware/Firmware/MPCSAMPLE-1.3.0.12-update.img`
+   （此路径已被 Git 忽略）。在 macOS 更新程序中，镜像位于 `Contents/Resources/Update.img`。
+   构建时会根据 `inputs.sha256` 校验镜像的 SHA-256，将缺少的分区解包到 `firmware/extracted/`，
+   并校验分区的 SHA-256。已有的分区文件会继续使用。
 3. 构建并运行：
 
    ```bash
@@ -96,7 +96,6 @@ Windows 上使用 `py lab.py ...`。macOS 上请从 Terminal.app 或 iTerm 启�
 
 以下任何一项都欢迎贡献：
 
-- **1.3.0.12 固件解包工具**，简化旧版固件的配置。
 - **在 Windows 和 Linux 上运行。** 相关代码已存在，但只在 macOS（Apple Silicon）上实际运行过。
 - **预编译的内核和音频桥** 作为 release 下载，省去 15 分钟的 Docker 构建。
 - **CI**：在每个 pull request 上运行 `make test`（实验室和面板的自检）。

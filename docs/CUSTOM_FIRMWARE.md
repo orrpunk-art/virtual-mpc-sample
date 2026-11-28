@@ -131,42 +131,20 @@ still needs a way onto the device, such as an autorun package (1).
 
 ## 4. Another stock firmware version
 
-1. Get the inMusic update image for that version (`MPCSAMPLE-<version>-update.img`).
-2. Extract its partitions into `FW_DIR` (default `./firmware`, git-ignored):
+The lab has profiles for [1.3.0.12](../README.md#quick-start) and
+[1.4.0.8](../README.md#firmware-1408). For either profile, `lab.py build images`
+checks the SHA-256 of the stock update image, extracts any missing boot, rootfs and
+recovery partitions, and checks each extracted file against the profile's manifest.
 
-   ```
-   $FW_DIR/extracted/part1   boot partition (ext2 with kernel.fit)
-   $FW_DIR/extracted/part2   rootfs (ext4 with the dm-verity hash tree)
-   $FW_DIR/extracted/parr    recovery partition (ext2)
-   ```
+For another version, add a profile in `lab.py` with its own SHA-256 manifest for the
+update image and partitions. Check the partition names in the AZ0x container and update
+the mapping in `lab.py` if needed. The build reads the kernel command line, including the
+dm-verity table and root hash, from the new version's FIT and takes the boot splash from
+its initramfs. Check the control-surface protocol, `ac50.service`, the USB gadget scheme
+and the autorun runner. Packages that check the app's SHA-256 may need their own updates.
 
-   The update image is an `AZ0x` container. Once the image has passed its SHA-256 in the
-   manifest, `lab.py build images` extracts any partition the manifest names that is
-   missing (`az0x_sections()` and `extract_partition()` in `lab.py`), as it does for
-   1.3.0.12 and 1.4.0.8.
-3. Write the new SHA-256 values into `inputs.sha256`, so that `build` checks them:
-
-   ```bash
-   cd "$FW_DIR" && shasum -a 256 extracted/part1 extracted/part2 extracted/parr \
-       Firmware/MPCSAMPLE-<version>-update.img
-   ```
-
-4. Rebuild the disk images from the new partitions, and start from a clean eMMC:
-
-   ```bash
-   python3 lab.py stop
-   REBUILD_EMMC=1 python3 lab.py build images
-   python3 lab.py build content     # if you have the factory library
-   python3 lab.py reset
-   python3 lab.py run
-   ```
-
-   The kernel command line, including the dm-verity table and root hash, is read from the
-   new version's FIT, and the boot splash is taken from its initramfs.
-
-Only 1.3.0.12 has been run in the lab. Other versions can differ in what the lab relies
-on: the app's control-surface protocol, `ac50.service`, the gadget scheme and the autorun
-runner. Packages that check the app's SHA-256 refuse another version on purpose.
+See [Rebuild the virtual eMMC](USAGE.md#rebuild-the-virtual-emmc) for how to recreate a
+profile's existing base image after changing its firmware inputs.
 
 A modified rootfs does not boot: dm-verity rejects any block whose hash does not match the
 stock root hash. Use the lab layer (3) for lab changes instead.
