@@ -751,7 +751,8 @@ def verify_inputs():
         for line in f:
             digest, rel = line.split(None, 1)
             inputs[rel.strip()] = digest
-    for rel, digest in inputs.items():
+    # The update image first: missing partitions are extracted from it, then checked below.
+    for rel, digest in sorted(inputs.items(), key=lambda item: os.path.basename(item[0]) != update):
         path = os.path.join(FW_DIR, rel)
         if not os.path.isfile(path):
             die(f"firmware input {rel} not found in FW_DIR={FW_DIR}")
@@ -762,23 +763,53 @@ def verify_inputs():
             if h.hexdigest() != digest:
                 die(f"{rel}: SHA-256 mismatch")
             print(f"{rel}: OK")
-            if not LEGACY and rel == update:
+            if os.path.basename(rel) == update:
                 for partition in inputs:
                     if partition.startswith("extracted/") and not os.path.exists(os.path.join(FW_DIR, partition)):
                         extract_partition(source, partition)
 
 
+# Partition files of each profile, by their name in the AZ0x update image.
+AZ0X_NAMES = {"part1": "boot", "part2": "rootfs", "parr": "recovery",
+              "01-recovery.img": "recovery", "02-boot.img": "boot", "03-rootfs.img": "rootfs"}
+
+
+def az0x_sections(source):
+    """The partitions of an AZ0x update image: {name: (offset, size, sha256 of the stored data)}.
+    Header: "AZ0x", u32 string table at 0x0c, u32 section table start/end at 0x18/0x1c.
+    Sections are 64 bytes: tag, u32 flags (bit 0: partition), u64 offset, u64 size,
+    u64 name (offset in the string table), SHA-256 of the stored (xz) data."""
+    source.seek(0)
+    head = source.read(0x20)
+    if head[:4] != b"AZ0x":
+        die("not an AZ0x update image")
+    strings, = struct.unpack_from("<I", head, 0x0c)
+    start, end = struct.unpack_from("<II", head, 0x18)
+    source.seek(0)
+    meta = source.read(end)
+    sections = {}
+    for pos in range(start, end, 0x40):
+        _tag, flags, offset, size, name = struct.unpack_from("<4sIQQQ", meta, pos)
+        if flags & 1:
+            label = meta[strings + name:].split(b"\0", 1)[0].decode("ascii", "replace")
+            sections[label] = (offset, size, meta[pos + 32:pos + 64].hex())
+    return sections
+
+
 def extract_partition(source, partition):
+    import hashlib
     import lzma
     import tempfile
 
     # This runs only after the complete stock AZ0x update has passed its pinned hash.
-    source.seek(0x18)
-    table, = struct.unpack("<I", source.read(4))
-    index = int(os.path.basename(partition).split("-", 1)[0])
-    source.seek(table + index * 0x40 + 8)
-    offset, remaining = struct.unpack("<QQ", source.read(16))
+    name = AZ0X_NAMES[os.path.basename(partition)]
+    sections = az0x_sections(source)
+    if name not in sections:
+        die(f"{partition}: no '{name}' partition in the AZ0x update")
+    offset, remaining, digest = sections[name]
+    print(f"{partition}: extracting the '{name}' partition")
     source.seek(offset)
+    stored = hashlib.sha256()
     path = os.path.join(FW_DIR, partition)
     directory = os.path.dirname(path)
     os.makedirs(directory, exist_ok=True)
@@ -789,7 +820,10 @@ def extract_partition(source, partition):
             if not chunk:
                 die(f"{partition}: truncated AZ0x payload")
             compressed.write(chunk)
+            stored.update(chunk)
             remaining -= len(chunk)
+        if stored.hexdigest() != digest:
+            die(f"{partition}: the AZ0x section does not match its SHA-256")
         compressed.seek(0)
         staged = os.path.join(work, "partition.img")
         with lzma.open(compressed, "rb") as payload, open(staged, "wb") as target:
@@ -864,6 +898,37 @@ def selftest():
             raise AssertionError("zip with ../ accepted")
         except ValueError:
             pass
+    # a small AZ0x container: string table, three xz partitions and one non-partition section
+    import hashlib
+    import io
+    import lzma
+    payloads = {"recovery": b"R" * 3000, "boot": b"B" * 5000, "rootfs": b"F" * 7000}
+    strings = b"MPC Sample image\0recovery\0boot\0rootfs\0"
+    names = {"recovery": 17, "boot": 26, "rootfs": 31}
+    blobs = {k: lzma.compress(v) for k, v in payloads.items()}
+    table, head = 0x90, bytearray(0x90 + 4 * 0x40)
+    head[0:4], head[0x0c:0x10] = b"AZ0x", struct.pack("<I", 0x38)
+    head[0x18:0x20] = struct.pack("<II", table, table + 4 * 0x40)
+    head[0x38:0x38 + len(strings)] = strings
+    data, offset = b"", len(head)
+    for i, name in enumerate(["dtb", "recovery", "boot", "rootfs"]):
+        blob = blobs.get(name, b"dtb")
+        flags, name_off = (1, names[name]) if name in names else (0, 0)
+        entry = struct.pack("<4sIQQQ", b"PART", flags, offset + len(data), len(blob), name_off)
+        head[table + i * 0x40:table + (i + 1) * 0x40] = entry + hashlib.sha256(blob).digest()
+        data += blob
+    image = io.BytesIO(bytes(head) + data)
+    assert {k: v[1] for k, v in az0x_sections(image).items()} == {k: len(v) for k, v in blobs.items()}
+    global FW_DIR
+    saved, FW_DIR = FW_DIR, tempfile.mkdtemp()
+    try:
+        for partition, name in (("extracted/part1", "boot"), ("extracted/03-rootfs.img", "rootfs")):
+            extract_partition(image, partition)
+            with open(os.path.join(FW_DIR, partition), "rb") as f:
+                assert f.read() == payloads[name]
+    finally:
+        shutil.rmtree(FW_DIR)
+        FW_DIR = saved
     print("lab selftest ok")
 
 
